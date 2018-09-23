@@ -7,11 +7,10 @@ namespace JWK.Contants
     [TypeConverter(typeof(ConstantConverter))]
     public sealed class Algorithm
     {
-
         // HMAC
-        public static readonly Algorithm HS256 = new Algorithm("HS256", KeyType.OctetSequence);
-        public static readonly Algorithm HS384 = new Algorithm("HS384", KeyType.OctetSequence);
-        public static readonly Algorithm HS512 = new Algorithm("HS512", KeyType.OctetSequence);
+        public static readonly Algorithm HS256 = new Algorithm("HS256", KeyType.HMAC);
+        public static readonly Algorithm HS384 = new Algorithm("HS384", KeyType.HMAC);
+        public static readonly Algorithm HS512 = new Algorithm("HS512", KeyType.HMAC);
 
         // RSA
         public static readonly Algorithm RS256 = new Algorithm("RS256", KeyType.RSA);
@@ -24,21 +23,20 @@ namespace JWK.Contants
         public static readonly Algorithm ES512 = new Algorithm("ES512", KeyType.EllipticCurve);
 
         // AES
-        public static readonly Algorithm A128GCM = new Algorithm("A128GCM", KeyType.OctetSequence);
-        public static readonly Algorithm A256GCM = new Algorithm("A256GCM", KeyType.OctetSequence);
+        public static readonly Algorithm A128GCM = new Algorithm("A128GCM", KeyType.AES);
+        public static readonly Algorithm A256GCM = new Algorithm("A256GCM", KeyType.AES);
 
         // None
-        public static readonly Algorithm None = new Algorithm("none", KeyType.OctetSequence);
+        public static readonly Algorithm None = new Algorithm("none", KeyType.None);
 
         private readonly string value;
+        public KeyType KeyType { get; }
 
         private Algorithm(string value, KeyType keyType)
         {
             this.value = value;
             this.KeyType = keyType;
         }
-
-        public KeyType KeyType { get; }
 
         public override string ToString()
         {

@@ -9,7 +9,9 @@ namespace JWK.Contants
     {
         public static readonly KeyType EllipticCurve = new KeyType("EC");
         public static readonly KeyType RSA = new KeyType("RSA");
-        public static readonly KeyType OctetSequence = new KeyType("oct");
+        public static readonly KeyType HMAC = new KeyType("oct");
+        public static readonly KeyType AES = new KeyType("oct");
+        public static readonly KeyType None = new KeyType("oct");
 
         private readonly string value;
 
