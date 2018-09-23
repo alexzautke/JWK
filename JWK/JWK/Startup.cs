@@ -1,5 +1,5 @@
 ﻿using System;
-using JWK.Contants;
+using JWK.KeyParts;
 
 namespace JWK
 {
@@ -12,7 +12,7 @@ namespace JWK
             JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = KeyOperations.ComputeDigitalSignature;
-            Algorithm algorithm = Algorithm.None;
+            Algorithm algorithm = Algorithm.ES256;
             string jwkString = jwk.JWKfromOptions(keyUse, keyOperations, algorithm);
 
             Console.WriteLine(jwkString);
