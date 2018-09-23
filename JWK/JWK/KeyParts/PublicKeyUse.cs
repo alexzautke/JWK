@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using JWK.TypeConverters;
 
-namespace JWK.Contants
+namespace JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.2. "use" (Public Key Use) Parameters
     [TypeConverter(typeof(ConstantConverter))]

@@ -13,7 +13,7 @@
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="KeyPart\" />
+    <Folder Include="KeyParts\" />
     <Folder Include="TypeConverters\" />
   </ItemGroup>
 </Project>

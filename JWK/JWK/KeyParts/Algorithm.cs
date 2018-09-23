@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using JWK.TypeConverters;
 
-namespace JWK.Contants
+namespace JWK.KeyParts
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 4.4. "alg" (Algorithm) Parameter
     [TypeConverter(typeof(ConstantConverter))]

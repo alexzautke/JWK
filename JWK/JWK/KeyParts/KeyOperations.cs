@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using JWK.TypeConverters;
 
-namespace JWK.Contants
+namespace JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.3. "key_ops" (Key Operations) Parameter
     [TypeConverter(typeof(ConstantConverter))]
