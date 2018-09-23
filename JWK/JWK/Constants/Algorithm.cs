@@ -31,15 +31,14 @@ namespace JWK.Contants
         public static readonly Algorithm None = new Algorithm("none", KeyType.OctetSequence);
 
         private readonly string value;
-        private readonly KeyType keyType;
 
         private Algorithm(string value, KeyType keyType)
         {
             this.value = value;
-            this.keyType = keyType;
+            this.KeyType = keyType;
         }
 
-        public KeyType KeyType => keyType;
+        public KeyType KeyType { get; }
 
         public override string ToString()
         {
