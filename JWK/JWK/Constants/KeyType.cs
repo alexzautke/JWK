@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace JWK
+﻿namespace JWK.Contants
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 6.1. "kty" (Key Type) Parameter Values
     public sealed class KeyType

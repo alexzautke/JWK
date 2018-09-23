@@ -1,4 +1,4 @@
-﻿namespace JWK
+﻿namespace JWK.Contants
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 4.4. "alg" (Algorithm) Parameter
     public sealed class Algorithm

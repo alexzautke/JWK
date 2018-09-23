@@ -1,5 +1,4 @@
-﻿using System;
-namespace JWK
+﻿namespace JWK.Contants
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.3. "key_ops" (Key Operations) Parameter
     public sealed class KeyOperations

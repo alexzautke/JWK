@@ -12,4 +12,7 @@
   <ItemGroup>
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Constants\" />
+  </ItemGroup>
 </Project>
