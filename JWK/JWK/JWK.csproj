@@ -14,5 +14,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Constants\" />
+    <Folder Include="TypeConverters\" />
   </ItemGroup>
 </Project>

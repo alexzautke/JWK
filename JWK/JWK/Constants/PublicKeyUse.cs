@@ -1,17 +1,19 @@
-﻿namespace JWK.Contants
+﻿using System.ComponentModel;
+using JWK.TypeConverters;
+
+namespace JWK.Contants
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.2. "use" (Public Key Use) Parameters
+    [TypeConverter(typeof(ConstantConverter))]
     public sealed class PublicKeyUse
     {
-        public static readonly PublicKeyUse Signature = new PublicKeyUse(1, "sig");
-        public static readonly PublicKeyUse Encryption = new PublicKeyUse(2, "enc");
+        public static readonly PublicKeyUse Signature = new PublicKeyUse("sig");
+        public static readonly PublicKeyUse Encryption = new PublicKeyUse("enc");
 
         private readonly string value;
-        private readonly int id;
 
-        private PublicKeyUse(int id, string value)
+        private PublicKeyUse(string value)
         {
-            this.id = id;
             this.value = value;
         }
 
