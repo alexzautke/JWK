@@ -3,10 +3,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using JWK.TypeConverters;
+using Newtonsoft.Json;
 
 namespace JWK.KeyParts
 {
-    [TypeConverter(typeof(ConstantConverter))]
     public sealed class KeyParameters
     {
         private readonly Dictionary<string, string> values;
@@ -19,7 +19,7 @@ namespace JWK.KeyParts
         {
             return values.Aggregate(new StringBuilder(),(result, 
                                                          currentValue) => result.AppendFormat("\"{0}\":\"{1}\",", currentValue.Key, currentValue.Value), 
-                                                         sb => sb.ToString());
+                                                         sb => sb.ToString().Trim(','));
         }
     }
 }
