@@ -1,7 +1,8 @@
 # C# JWKs - JSON Web Keys (RFC7517)
 This repository provides an implementation in C# of RFC7517 (JSON Web Keys).
 
-`Notice: The current implementation has not been used in a production environment. Here be dragons. Please fill any bugs you may find.`
+`Notice: The current implementation has not been used in a production environment.` 
+<br>`Here be dragons. Please fill any bugs you may find.`
 
 ## Getting Started
 
@@ -23,7 +24,7 @@ Supported Key Types for creating new JWKs:
 
 |                               | Meaning |
 |-------------------------------|:-------------                         |
-| :white_check_mark:            | Fully Implemented and tested           |
+| :white_check_mark:            | Fully implemented and tested           |
 | :negative_squared_cross_mark: | Currently being implemented / Untested |
 | :x:                           | Not implemented yet                    |
 
