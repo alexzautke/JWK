@@ -75,6 +75,15 @@ namespace JWK
 
         }
 
+        private string Base64urlEncode(byte[] s)
+        {
+            string base64 = Convert.ToBase64String(s); // Regular base64 encoder
+            base64 = base64.Split('=')[0]; // Remove any trailing '='s
+            base64 = base64.Replace('+', '-');
+            base64 = base64.Replace('/', '_');
+            return base64;
+        }
+
     }
 
 }
