@@ -24,7 +24,7 @@ Supported Key Types for creating new JWKs:
 
 |                               | Meaning |
 |-------------------------------|:-------------                         |
-| :white_check_mark:            | Fully Implemented and tested           |
+| :white_check_mark:            | Fully implemented and tested           |
 | :negative_squared_cross_mark: | Currently being implemented / Untested |
 | :x:                           | Not implemented yet                    |
 
