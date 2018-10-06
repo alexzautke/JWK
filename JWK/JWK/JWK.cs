@@ -34,7 +34,7 @@ namespace JWK
             this.keyOperations = keyOperations;
             this.algorithm = algorithm;
             this.keyID = Guid.NewGuid();
-            this.keyType =
+            this.keyType = algorithm.KeyType;
 
             if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
                 ECParameters();
