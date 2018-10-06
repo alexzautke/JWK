@@ -5,3 +5,4 @@ solution: JWK.sln
 script:
  - cd JWK
  - dotnet restore
+ - msbuild /p:Configuration=Release JWK.sln
