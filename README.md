@@ -4,6 +4,8 @@ This repository provides an implementation in C# of RFC7517 (JSON Web Keys).
 `Notice: The current implementation has not been used in a production environment.` 
 <br>`Here be dragons. Please fill any bugs you may find.`
 
+[![Build Status](https://travis-ci.com/alexzautke/JWK.svg?branch=master)](https://travis-ci.com/alexzautke/JWK)
+
 ## Getting Started
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key.
