@@ -1,2 +1,6 @@
 language: csharp
-solution: solution-name.sln
+mono: none
+dotnet: 2.1.302
+solution: JWK/JWK.sln
+script:
+ - dotnet restore
