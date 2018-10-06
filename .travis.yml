@@ -1,6 +1,7 @@
 language: csharp
 mono: none
 dotnet: 2.1.302
-solution: JWK/JWK.sln
+solution: JWK.sln
 script:
+ - cd JWK
  - dotnet restore
