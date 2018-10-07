@@ -31,7 +31,7 @@ namespace JWK.TypeConverters
                 foreach (var customAttributeData in field.CustomAttributes){
                     if (customAttributeData.AttributeType != typeof(JsonPropertyAttribute))
                     {
-                        break; // Only serailize fields which are marked with "JsonProperty"
+                        break; // Only serialize fields which are marked with "JsonProperty"
                     }
 
                     if (customAttributeData.NamedArguments.Count() > 0) // JWK class indicated a custom name
@@ -39,7 +39,7 @@ namespace JWK.TypeConverters
                         var customJSONPropertyName = customAttributeData.NamedArguments[0].TypedValue.ToString();
                         writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                     }
-                    else // Attribute handles JSON property names and formatting itself
+                    else // Attribute handles JSON property name and formatting itself
                     {
                         writer.WriteRaw(propertyValue.ToString());
                     }
