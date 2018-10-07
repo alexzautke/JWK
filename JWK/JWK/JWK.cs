@@ -7,6 +7,7 @@ using JWK.TypeConverters;
 
 namespace JWK
 {
+    [JsonConverter(typeof(JWKConverter))]
     public class JWK
     {
         [JsonProperty(PropertyName = "kty")]
