@@ -4,7 +4,6 @@ using JWK.TypeConverters;
 namespace JWK.KeyParts
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 4.4. "alg" (Algorithm) Parameter
-    [TypeConverter(typeof(ConstantConverter))]
     public sealed class Algorithm
     {
         // HMAC

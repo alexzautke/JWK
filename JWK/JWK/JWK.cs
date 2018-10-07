@@ -2,9 +2,12 @@
 using Newtonsoft.Json;
 using JWK.KeyParts;
 using System.Security.Cryptography;
+using System.Collections.Generic;
+using JWK.TypeConverters;
 
 namespace JWK
 {
+    [JsonConverter(typeof(JWKConverter))]
     public class JWK
     {
         [JsonProperty(PropertyName = "kty")]
@@ -22,6 +25,9 @@ namespace JWK
         [JsonProperty(PropertyName = "kid")]
         private Guid keyID;                     // OPTIONAL
 
+        [JsonProperty]
+        private KeyParameters keyParameters;    // OPTIONAL
+
         public string JWKfromOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
         {
             this.publicKeyUse = publicKeyUse;
@@ -31,7 +37,7 @@ namespace JWK
             this.keyType = algorithm.KeyType;
 
             if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
-                throw new NotImplementedException("Elliptic Curve Key Parameters are not yet supported");
+                ECParameters();
             }
             else if(algorithm.KeyType.Equals(KeyType.RSA)){
                 throw new NotImplementedException("RSA Key Parameters are not yet supported");
@@ -44,19 +50,50 @@ namespace JWK
             {
                 throw new NotImplementedException("AES Key Parameters are not yet supported");
             }
-            else{
+            else
+            {
                 throw new NotImplementedException("None Key Type is not yet supported");
             }
 
             return JsonConvert.SerializeObject(this);
         }
 
-        private void ECAParameters()
+        private void ECParameters()
         {
+            ECDsa eCDsa = ECDsa.Create();
+            var keyLength = algorithm.ToString().Split("ES")[1]; // Algorithm = 'ES' + Keylength
+            var curveName = "P-" + keyLength;
+            Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
+            switch (keyLength)
+            {
+                case "256":
+                    curveOid = new Oid("1.2.840.10045.3.1.7");
+                    break;
+                case "384":
+                    curveOid = new Oid("1.3.132.0.34");
+                    break;
+                case "512":
+                    curveOid = new Oid("1.3.132.0.35");
+                    break;
+            }
+            eCDsa.GenerateKey(ECCurve.CreateFromOid(curveOid));
 
+            ECParameters eCParameters = eCDsa.ExportParameters(true);
+            var privateKeyD = Base64urlEncode(eCParameters.D);
+            var publicKeyX = Base64urlEncode(eCParameters.Q.X);
+            var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
+
+            keyParameters = new KeyParameters(new Dictionary<string, string>
+            {
+                {"crv", curveName},
+                {"x", publicKeyX},
+                {"y", publicKeyY},
+                {"d", privateKeyD}
+            });
         }
 
-        private void RSAParameters(){
+        private void RSAParameters()
+        {
 
         }
 

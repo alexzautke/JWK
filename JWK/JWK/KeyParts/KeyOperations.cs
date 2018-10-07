@@ -4,7 +4,6 @@ using JWK.TypeConverters;
 namespace JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.3. "key_ops" (Key Operations) Parameter
-    [TypeConverter(typeof(ConstantConverter))]
     public sealed class KeyOperations
     {
         public static readonly KeyOperations ComputeDigitalSignature = new KeyOperations("sign");
