@@ -25,7 +25,6 @@ namespace JWK
         [JsonProperty(PropertyName = "kid")]
         private Guid keyID;                     // OPTIONAL
 
-        [JsonConverter(typeof(KeyParametersConverter))]
         [JsonProperty]
         private KeyParameters keyParameters;    // OPTIONAL
 
@@ -51,7 +50,8 @@ namespace JWK
             {
                 throw new NotImplementedException("AES Key Parameters are not yet supported");
             }
-            else{
+            else
+            {
                 throw new NotImplementedException("None Key Type is not yet supported");
             }
 
@@ -64,7 +64,8 @@ namespace JWK
             var keyLength = algorithm.ToString().Split("ES")[1]; // Algorithm = 'ES' + Keylength
             var curveName = "P-" + keyLength;
             Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
-            switch (keyLength){
+            switch (keyLength)
+            {
                 case "256":
                     curveOid = new Oid("1.2.840.10045.3.1.7");
                     break;
@@ -82,7 +83,8 @@ namespace JWK
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
 
-            keyParameters = new KeyParameters(new Dictionary<string, string>{
+            keyParameters = new KeyParameters(new Dictionary<string, string>
+            {
                 {"crv", curveName},
                 {"x", publicKeyX},
                 {"y", publicKeyY},
@@ -90,7 +92,8 @@ namespace JWK
             });
         }
 
-        private void RSAParameters(){
+        private void RSAParameters()
+        {
 
         }
 
