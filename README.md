@@ -4,8 +4,6 @@ This repository provides an implementation in C# of RFC7517 (JSON Web Keys).
 `Notice: The current implementation has not been used in a production environment.` 
 <br>`Here be dragons. Please fill any bugs you may find.`
 
-[![Build Status](https://travis-ci.com/alexzautke/JWK.svg?branch=master)](https://travis-ci.com/alexzautke/JWK)
-
 ## Getting Started
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key.
@@ -30,11 +28,13 @@ Supported Key Types for creating new JWKs:
 | :negative_squared_cross_mark: | Currently being implemented / Untested |
 | :x:                           | Not implemented yet                    |
 
-## Build dependencies
+## Build
 
 The following configuration has been succesfully tested for building and running the project:
-* Visual Studio for Mac - Version 7.6.6
-* .Net Core - Version 2.1
+* Visual Studio for Mac - Version 7.6.8 (build 38)
+* .Net Core - Version 2.1.302
+
+[![Build Status](https://travis-ci.com/alexzautke/JWK.svg?branch=master)](https://travis-ci.com/alexzautke/JWK)
 
 ## Limitations
 
@@ -47,7 +47,6 @@ The following configuration has been succesfully tested for building and running
 - [] Describe how to run tests (Test section)
 - [] Document Security Conciderations (Security Conciderations section)
 - [] Description of how to use the project as a library (INSTALL section)
-- [] Continuous Integration and Build Status (Build dependencies section)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details 
