@@ -16,13 +16,13 @@ All details of the implementation are based on the following literature:
 
 Supported Key Types for creating new JWKs:
 
-|                | Support |
-|----------------|:-------------------------------|
-| RSA            | :x:                             |
-| Eliptic Curves | :negative_squared_cross_mark:   |
-| HMAC           | :x:                             |
-| AES            | :x:                             |
-| None           | :x:                             |
+|                | Algorithm | Support |
+|----------------|:-----------------------------|:-------------------------------|
+| RSA            | RS256, RS384, RS512          | :x:
+| Eliptic Curves | ES256, ES384, ES512          | :negative_squared_cross_mark:
+| HMAC           | HS256, HS384, HS512          | :x:
+| AES            | A128GCM, A192GCM, A256GCM    | :x:
+| None           | none                         | :x: 
 
 |                               | Meaning |
 |-------------------------------|:-------------                         |
