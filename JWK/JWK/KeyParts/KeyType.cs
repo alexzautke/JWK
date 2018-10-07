@@ -4,7 +4,6 @@ using JWK.TypeConverters;
 namespace JWK.KeyParts
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 6.1. "kty" (Key Type) Parameter Values
-    [TypeConverter(typeof(ConstantConverter))]
     public sealed class KeyType
     {
         public static readonly KeyType EllipticCurve = new KeyType("EC");
