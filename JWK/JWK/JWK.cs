@@ -40,18 +40,22 @@ namespace JWK
                 ECParameters();
             }
             else if(algorithm.KeyType.Equals(KeyType.RSA)){
+                //Alex (RFC-7518)
                 throw new NotImplementedException("RSA Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.HMAC))
             {
+                //Alex (RFC-7518)
                 throw new NotImplementedException("HMAC Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.AES))
             {
+                //Markus (RFC-7518)
                 throw new NotImplementedException("AES Key Parameters are not yet supported");
             }
             else
             {
+                //Markus (RFC-7518)
                 throw new NotImplementedException("None Key Type is not yet supported");
             }
 
