@@ -41,21 +41,24 @@ namespace JWK
             }
             else if(algorithm.KeyType.Equals(KeyType.RSA)){
                 //Alex (RFC-7518)
+                RSAParameters();
                 throw new NotImplementedException("RSA Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.HMAC))
             {
                 //Alex (RFC-7518)
+                HMACParameters();
                 throw new NotImplementedException("HMAC Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.AES))
             {
                 //Markus (RFC-7518)
-                throw new NotImplementedException("AES Key Parameters are not yet supported");
+                AESParameters();
             }
             else
             {
                 //Markus (RFC-7518)
+                NONEParameters();
                 throw new NotImplementedException("None Key Type is not yet supported");
             }
 
@@ -108,7 +111,21 @@ namespace JWK
 
         private void AESParameters()
         {
+            Aes aes = Aes.Create();
 
+            var keylength = algorithm.ToString().Substring(1).Split("GCM")[0];
+
+            if(aes.ValidKeySize(int.Parse(keylength))) {
+                aes.KeySize = int.Parse(keylength);
+                aes.GenerateKey();
+
+                keyParameters = new KeyParameters(new Dictionary<string, string>
+                {
+                    {"key", Convert.ToBase64String(aes.Key)}
+                });
+            } else {
+                Console.WriteLine("Invalid Keysize: " + keylength);
+            }
         }
 
         private void NONEParameters()

@@ -12,7 +12,7 @@ namespace JWK
             JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = KeyOperations.ComputeDigitalSignature;
-            Algorithm algorithm = Algorithm.ES256;
+            Algorithm algorithm = Algorithm.A128GCM;
             string jwkString = jwk.JWKfromOptions(keyUse, keyOperations, algorithm);
 
             Console.WriteLine(jwkString);
