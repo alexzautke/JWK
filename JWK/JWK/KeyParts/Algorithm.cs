@@ -22,8 +22,9 @@ namespace JWK.KeyParts
         public static readonly Algorithm ES512 = new Algorithm("ES512", KeyType.EllipticCurve);
 
         // AES
-        public static readonly Algorithm A128GCM = new Algorithm("A128GCM", KeyType.AES);
-        public static readonly Algorithm A256GCM = new Algorithm("A256GCM", KeyType.AES);
+        public static readonly Algorithm A128GCMKW = new Algorithm("A128GCMKW", KeyType.AES);
+        public static readonly Algorithm A192GCMKW = new Algorithm("A192GCMKW", KeyType.AES);
+        public static readonly Algorithm A256GCMKW = new Algorithm("A256GCMKW", KeyType.AES);
 
         // None
         public static readonly Algorithm None = new Algorithm("none", KeyType.None);
