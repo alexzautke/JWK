@@ -4,6 +4,7 @@ using JWK.KeyParts;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 using JWK.TypeConverters;
+using System.Text.RegularExpressions;
 
 namespace JWK
 {
@@ -128,23 +129,28 @@ namespace JWK
 
         }
 
+        // ToDo:
+        //  - Improve Error Handling ValidKeySize
+
         private void AESParameters()
         {
-            Aes aes = Aes.Create();
+            var aesKey = Aes.Create();
 
-            var keylength = algorithm.ToString().Substring(1).Split("GCM")[0];
-
-            if(aes.ValidKeySize(int.Parse(keylength))) {
-                aes.KeySize = int.Parse(keylength);
-                aes.GenerateKey();
-
-                keyParameters = new KeyParameters(new Dictionary<string, string>
-                {
-                    {"key", Convert.ToBase64String(aes.Key)}
-                });
-            } else {
-                Console.WriteLine("Invalid Keysize: " + keylength);
+            Regex keySizeRegex = new Regex(@"(?<keySize>[1-9]+)", RegexOptions.Compiled);
+            var matches = keySizeRegex.Match(algorithm.ToString());
+            var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
+            var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
+            if(!aesKey.ValidKeySize(aesKeySize)) {
+                // Throw exception
             }
+            aesKey.KeySize = aesKeySize;
+
+            aesKey.GenerateKey();
+
+            keyParameters = new KeyParameters(new Dictionary<string, string>
+            {
+                {"k", Base64urlEncode(aesKey.Key)}
+            });
         }
 
         private void NONEParameters()
