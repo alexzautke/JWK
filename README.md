@@ -12,11 +12,11 @@ All details of the implementation are based on the following literature:
 * [RFC 7517 - JSON Web Keys](https://www.rfc-editor.org/rfc/rfc7517.txt)
 * [RFC 7518 - JSON Web Algorithms](https://www.rfc-editor.org/rfc/rfc7518.txt)
 
-Supported Key Types for creating new JWKs:
+Supported Key Types for creating new JWKs (with the corresponding intended algorithm):
 
 |                | Algorithm | Support |
 |----------------|:-----------------------------|:-------------------------------|
-| RSA            | RS256, RS384, RS512          | :x:
+| RSA            | RS256, RS384, RS512          | :negative_squared_cross_mark:
 | Eliptic Curves | ES256, ES384, ES512          | :negative_squared_cross_mark:
 | HMAC           | HS256, HS384, HS512          | :x:
 | AES            | A128GCM, A192GCM, A256GCM    | :x:
