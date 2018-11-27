@@ -11,7 +11,7 @@ namespace JWK.KeyParts
         public static readonly Algorithm HS384 = new Algorithm("HS384", KeyType.HMAC);
         public static readonly Algorithm HS512 = new Algorithm("HS512", KeyType.HMAC);
 
-        // RSA
+        // RSA (PS256, PS384, PS512 are not planned to be supported)
         public static readonly Algorithm RS256 = new Algorithm("RS256", KeyType.RSA);
         public static readonly Algorithm RS384 = new Algorithm("RS384", KeyType.RSA);
         public static readonly Algorithm RS512 = new Algorithm("RS512", KeyType.RSA);
