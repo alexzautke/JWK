@@ -8,6 +8,8 @@ namespace JWK.TypeConverters
 	public class JWKConverter : JsonConverter
     {
 
+        private JsonWriter _writer;
+
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(JWK);
@@ -21,7 +23,8 @@ namespace JWK.TypeConverters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteStartObject();
+            _writer = writer;
+            _writer.WriteStartObject();
 
             var type = value.GetType();
             FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic|BindingFlags.Instance);
@@ -29,6 +32,7 @@ namespace JWK.TypeConverters
             {
                 var propertyValue = field.GetValue(value);
                 foreach (var customAttributeData in field.CustomAttributes){
+
                     if (customAttributeData.AttributeType != typeof(JsonPropertyAttribute))
                     {
                         break; // Only serialize fields which are marked with "JsonProperty"
@@ -37,21 +41,28 @@ namespace JWK.TypeConverters
                     if (customAttributeData.NamedArguments.Count() > 0) // JWK class indicated a custom name
                     {
                         var customJSONPropertyName = customAttributeData.NamedArguments[0].TypedValue.ToString();
-                        writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
+                        WriteTrailingComma(fields, field);
+                        _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                     }
                     else // Attribute handles JSON property name and formatting itself
                     {
-                        writer.WriteRaw(propertyValue.ToString());
-                    }
-
-                    if (field != fields.Last())
-                    {
-                        writer.WriteRaw(",");
+                        if(propertyValue != null)
+                        {
+                            WriteTrailingComma(fields, field);
+                            _writer.WriteRaw(propertyValue.ToString());
+                        }
                     }
                 }
             }
 
-            writer.WriteEndObject();
+            _writer.WriteEndObject();
+        }
+
+        private void WriteTrailingComma(FieldInfo[] fields, FieldInfo field){
+            if (field != fields.First()) // Don't start the JSON object with a comma
+            {
+                _writer.WriteRaw(",");
+            }
         }
 
     }
