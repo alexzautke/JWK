@@ -40,30 +40,29 @@ namespace JWK
                 ECParameters();
             }
             else if(algorithm.KeyType.Equals(KeyType.RSA)){
-                //Alex (RFC-7518)
                 RSAParameters();
-                throw new NotImplementedException("RSA Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.HMAC))
             {
-                //Alex (RFC-7518)
                 HMACParameters();
                 throw new NotImplementedException("HMAC Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.AES))
             {
-                //Markus (RFC-7518)
                 AESParameters();
             }
             else
             {
-                //Markus (RFC-7518)
                 NONEParameters();
                 throw new NotImplementedException("None Key Type is not yet supported");
             }
 
             return JsonConvert.SerializeObject(this);
         }
+
+        // ToDo:
+        //  - Check length of x,y,d parameter
+        //  - Use a boolean to indicate if the private key should be exported
 
         private void ECParameters()
         {
@@ -99,9 +98,29 @@ namespace JWK
             });
         }
 
+        // ToDo:
+        //  - Improve Error Handling RSACryptoServiceProvider
+        //  - Use a boolean to indicate if the private key should be exported
+
         private void RSAParameters()
         {
+            const int rsaKeySize = 2056; // See recommendations: https://www.keylength.com/en/compare/
+            using (var rsaKey = new RSACryptoServiceProvider(rsaKeySize)){
 
+                var rsaKeyParameters = rsaKey.ExportParameters(true);
+
+                // RSAParameters properties are big-endian, no need to reverse the byte array (See RFC7518 - 6.3.1. Parameters for RSA Public Keys)
+                var modulus = Base64urlEncode(rsaKeyParameters.Modulus);
+                var exponent = Base64urlEncode(rsaKeyParameters.Exponent);
+                var privateExponent = Base64urlEncode(rsaKeyParameters.D);
+
+                keyParameters = new KeyParameters(new Dictionary<string, string>
+                {
+                    {"n", modulus},
+                    {"e", exponent},
+                    {"d", privateExponent}
+                });
+            }
         }
 
         private void HMACParameters()
