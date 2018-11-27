@@ -55,7 +55,6 @@ namespace JWK
             else
             {
                 NONEParameters();
-                throw new NotImplementedException("None Key Type is not yet supported");
             }
 
             return JsonConvert.SerializeObject(this);
@@ -155,7 +154,7 @@ namespace JWK
 
         private void NONEParameters()
         {
-
+            keyParameters = null;
         }
 
         private string Base64urlEncode(byte[] s)
