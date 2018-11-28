@@ -20,7 +20,7 @@ Supported Key Types for creating new JWKs (with the corresponding intended algor
 | Eliptic Curves | ES256, ES384, ES512          | :negative_squared_cross_mark:
 | HMAC           | HS256, HS384, HS512          | :x:
 | AES            | A128GCM, A192GCM, A256GCM    | :negative_squared_cross_mark:
-| None           | none                         | :x: 
+| None           | none                         | :negative_squared_cross_mark: 
 
 |                               | Meaning |
 |-------------------------------|:-------------                         |
@@ -42,6 +42,8 @@ The following configuration has been succesfully tested for building and running
 - [] Complete support for all JWK Key Types
 - [] Support for exporting private / public keys in a JWKS (JSON Web Key Set)
 - [] Support for x5u, x5c, x5t, x5t#S256 parameters in a JWK
+- [] Support deserialization of JWKs
+- [] Support for exporting public keys only
 
 ### Documentation 
 - [] Describe how to run tests (Test section)
