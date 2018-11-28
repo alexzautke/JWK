@@ -158,10 +158,9 @@ namespace JWK
             var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
             var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
             if(!aesKey.ValidKeySize(aesKeySize)) {
-                // Throw exception
+                throw new CryptographicException("Could not create AES key based on algorithm " + algorithm + " (Could not parse expected AES key size)");
             }
             aesKey.KeySize = aesKeySize;
-
             aesKey.GenerateKey();
 
             keyParameters = new KeyParameters(new Dictionary<string, string>
