@@ -46,7 +46,6 @@ namespace JWK
             else if (algorithm.KeyType.Equals(KeyType.HMAC))
             {
                 HMACParameters();
-                throw new NotImplementedException("HMAC Key Parameters are not yet supported");
             }
             else if (algorithm.KeyType.Equals(KeyType.AES))
             {
@@ -117,9 +116,38 @@ namespace JWK
 
         private void HMACParameters()
         {
+            // Key size is selected based on https://tools.ietf.org/html/rfc2104#section-3
+            Regex keySizeRegex = new Regex(@"(?<shaVersion>[1-9]+)", RegexOptions.Compiled);
+            var matches = keySizeRegex.Match(algorithm.ToString());
+            var shaVersionFromAlgorithmName = matches.Groups["shaVersion"].Value;
 
+            HMAC hmac;
+            switch (shaVersionFromAlgorithmName){
+                case "256":
+                    hmac = new HMACSHA256(CreateHMACKey(64));
+                    break;
+                case "384":
+                    hmac = new HMACSHA384(CreateHMACKey(128));
+                    break;
+                case "512":
+                    hmac = new HMACSHA512(CreateHMACKey(128));
+                    break;
+                default:
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + algorithm + " (Could not parse expected SHA version)");
+            }
+
+            keyParameters = new KeyParameters(new Dictionary<string, string>
+            {
+                {"k", Base64urlEncode(hmac.Key)}
+            });
         }
 
+        private byte[] CreateHMACKey(int keySize){
+            byte[] key = new byte[keySize];
+            var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+            rngCryptoServiceProvider.GetBytes(key);
+            return key;
+        }
 
         private void AESParameters()
         {
