@@ -60,10 +60,6 @@ namespace JWK
             return JsonConvert.SerializeObject(this);
         }
 
-        // ToDo:
-        //  - Check length of x,y,d parameter
-        //  - Use a boolean to indicate if the private key should be exported
-
         private void ECParameters()
         {
             ECDsa eCDsa = ECDsa.Create();
@@ -98,10 +94,6 @@ namespace JWK
             });
         }
 
-        // ToDo:
-        //  - Improve Error Handling RSACryptoServiceProvider
-        //  - Use a boolean to indicate if the private key should be exported
-
         private void RSAParameters()
         {
             const int rsaKeySize = 2056; // See recommendations: https://www.keylength.com/en/compare/
@@ -128,8 +120,6 @@ namespace JWK
 
         }
 
-        // ToDo:
-        //  - Improve Error Handling ValidKeySize
 
         private void AESParameters()
         {
