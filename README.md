@@ -47,8 +47,37 @@ The following configuration has been succesfully tested for building and running
 
 ### Documentation 
 - [] Describe how to run tests (Test section)
-- [] Document Security Conciderations (Security Conciderations section)
 - [] Description of how to use the project as a library (INSTALL section)
+
+## Security Conciderations
+
+More details about security risks associated with JWKs are documented in [RFC section 9](https://tools.ietf.org/html/rfc7517#section-9).
+
+### Key Provenance and Trust
+
+`One should place no more trust in the data cryptographically secured
+   by a key than in the method by which it was obtained and in the
+   trustworthiness of the entity asserting an association with the key.`
+
+Please follow the recommendations on how to obtain a JWK.
+
+Current issues:
+- This library does currently not support the "x5c" element within a JWK.
+
+### Preventing Disclosure of Non-public Key Information
+
+`Private and symmetric keys MUST be protected from disclosure to
+   unintended parties.`
+
+Current issues:
+- This library does currently not use any kind of protected memory to store the generated key associated with a JWK.
+
+### Key Entropy and Random Values
+
+`Keys are only as strong as the amount of entropy used to generate
+   them.`
+
+This library does currenty not check if "enough" entropy is available on a system to generate a secure key.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details 
