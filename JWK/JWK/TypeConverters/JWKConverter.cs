@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 
-namespace JWK.TypeConverters
+namespace CreativeCode.JWK.TypeConverters
 {
 	public class JWKConverter : JsonConverter
     {

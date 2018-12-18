@@ -1,7 +1,7 @@
 ﻿using System;
-using JWK.KeyParts;
+using CreativeCode.JWK.KeyParts;
 
-namespace JWK
+namespace CreativeCode.JWK
 {
     public class Startup
     {

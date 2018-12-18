@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace JWK.KeyParts
+namespace CreativeCode.JWK.KeyParts
 {
     public sealed class KeyParameters
     {

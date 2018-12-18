@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using JWK.TypeConverters;
+using CreativeCode.JWK.TypeConverters;
 
-namespace JWK.KeyParts
+namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.3. "key_ops" (Key Operations) Parameter
     public sealed class KeyOperations

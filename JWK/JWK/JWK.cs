@@ -1,12 +1,12 @@
 ﻿using System;
 using Newtonsoft.Json;
-using JWK.KeyParts;
+using CreativeCode.JWK.KeyParts;
 using System.Security.Cryptography;
 using System.Collections.Generic;
-using JWK.TypeConverters;
+using CreativeCode.JWK.TypeConverters;
 using System.Text.RegularExpressions;
 
-namespace JWK
+namespace CreativeCode.JWK
 {
     [JsonConverter(typeof(JWKConverter))]
     public class JWK

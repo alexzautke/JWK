@@ -1,7 +1,9 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWK", "JWK\JWK.csproj", "{1B9F4D7B-10CF-4931-9EDB-F05926C4726F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreativeCode.JWK", "JWK\CreativeCode.JWK.csproj", "{1B9F4D7B-10CF-4931-9EDB-F05926C4726F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreativeCode.JWK-Run", "JWK-Run\CreativeCode.JWK-Run.csproj", "{63FD20C0-721C-43DE-9BC4-7F26FC8950A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,5 +15,9 @@ Global
 		{1B9F4D7B-10CF-4931-9EDB-F05926C4726F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B9F4D7B-10CF-4931-9EDB-F05926C4726F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B9F4D7B-10CF-4931-9EDB-F05926C4726F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63FD20C0-721C-43DE-9BC4-7F26FC8950A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63FD20C0-721C-43DE-9BC4-7F26FC8950A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63FD20C0-721C-43DE-9BC4-7F26FC8950A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63FD20C0-721C-43DE-9BC4-7F26FC8950A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

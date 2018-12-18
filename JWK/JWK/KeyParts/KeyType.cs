@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using JWK.TypeConverters;
+using CreativeCode.JWK.TypeConverters;
 
-namespace JWK.KeyParts
+namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 6.1. "kty" (Key Type) Parameter Values
     public sealed class KeyType

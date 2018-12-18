@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,5 +17,8 @@
   <ItemGroup>
     <Folder Include="KeyParts\" />
     <Folder Include="TypeConverters\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Startup.cs" />
   </ItemGroup>
 </Project>
