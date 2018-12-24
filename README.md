@@ -46,6 +46,7 @@ The following configuration has been succesfully tested for building and running
 - [] Support deserialization of JWKs
 - [] Support for exporting public keys only
 - [] Support for combinations of key operation parameters
+- [] Follow RFC7517 security conciderations guidelines 
 
 ### Documentation 
 - [] Describe how to run tests (Test section)
@@ -64,7 +65,7 @@ More details about security risks associated with JWKs are documented in [RFC se
 Please follow the recommendations on how to obtain a JWK.
 
 Current issues:
-- This library does currently not support the "x5c" element within a JWK.
+- This library does currently not support the "x5c" element within a JWK. It would enable the user to provide additional information about the authorship of the key.
 
 ### Preventing Disclosure of Non-public Key Information
 
