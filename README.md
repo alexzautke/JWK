@@ -78,8 +78,8 @@ Current issues:
 
 `Keys are only as strong as the amount of entropy used to generate
    them.`
-
-This library does currenty not check if "enough" entropy is available on a system to generate a secure key.
+Current issues:
+- This library does currenty not check if "enough" entropy is available on a system to generate a secure key.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details 
