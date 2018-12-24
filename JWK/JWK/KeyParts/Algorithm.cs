@@ -3,7 +3,10 @@ using CreativeCode.JWK.TypeConverters;
 
 namespace CreativeCode.JWK.KeyParts
 {
-    // See RFC 7518 - JSON Web Algorithms (JWA) - Section 4.4. "alg" (Algorithm) Parameter
+    /* See RFC 7518 - JSON Web Algorithms (JWA) 
+       - Section 7.1. JSON Web Signature and Encryption Algorithms Registry
+       - Section 3.1.  "alg" (Algorithm) Header Parameter Values for JWS      
+    */
     public sealed class Algorithm
     {
         // HMAC
