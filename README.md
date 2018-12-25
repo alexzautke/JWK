@@ -66,7 +66,7 @@ https://www.nuget.org/packages/CreativeCode.JWK/
 
 ## Usage
 
-<script src="https://gist.github.com/alexzautke/ef0466afb1ba6d348310dfff0fc0969b.js"></script>
+See [JWK Example](https://gist.github.com/alexzautke/ef0466afb1ba6d348310dfff0fc0969b)
 
 ## Security Conciderations
 
