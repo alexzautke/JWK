@@ -15,6 +15,7 @@
     <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
     <ReleaseVersion>0.0.1</ReleaseVersion>
     <SynchReleaseVersion>false</SynchReleaseVersion>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
