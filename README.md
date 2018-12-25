@@ -50,7 +50,19 @@ The following configuration has been succesfully tested for building and running
 
 ### Documentation 
 - [] Describe how to run tests (Test section)
-- [] Description of how to use the project as a library (INSTALL section)
+
+## INSTALL
+
+### NuGet
+
+https://www.nuget.org/packages/CreativeCode.JWK/
+``dotnet add package CreativeCode.JWK``
+
+### Building from source
+
+1. ``git clone https://github.com/alexzautke/JWK.git``
+2. ``dotnet pack -c Release``
+3. [Install NuGet package from local source](https://docs.microsoft.com/en-us/nuget/consume-packages/ways-to-install-a-package)
 
 ## Security Conciderations
 
