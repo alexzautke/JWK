@@ -64,6 +64,10 @@ https://www.nuget.org/packages/CreativeCode.JWK/
 2. ``dotnet pack -c Release``
 3. [Install NuGet package from local source](https://docs.microsoft.com/en-us/nuget/consume-packages/ways-to-install-a-package)
 
+## Usage
+
+<script src="https://gist.github.com/alexzautke/ef0466afb1ba6d348310dfff0fc0969b.js"></script>
+
 ## Security Conciderations
 
 More details about security risks associated with JWKs are documented in [RFC section 9](https://tools.ietf.org/html/rfc7517#section-9).
