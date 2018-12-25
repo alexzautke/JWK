@@ -12,30 +12,30 @@ namespace CreativeCode.JWK
     public class JWK
     {
         [JsonProperty(PropertyName = "kty")]
-        private KeyType keyType;                // REQUIRED
+        public KeyType KeyType { get; private set; }             // REQUIRED
 
         [JsonProperty(PropertyName = "use")]
-        private PublicKeyUse publicKeyUse;      // OPTIONAL
+        public PublicKeyUse PublicKeyUse { get; private set; }   // OPTIONAL
 
         [JsonProperty(PropertyName = "key_ops")]
-        private KeyOperations keyOperations;    // OPTIONAL
+        public KeyOperations KeyOperations { get; private set; } // OPTIONAL
 
         [JsonProperty(PropertyName = "alg")]
-        private Algorithm algorithm;            // OPTIONAL
+        public Algorithm Algorithm { get; private set; }         // OPTIONAL
 
         [JsonProperty(PropertyName = "kid")]
-        private Guid keyID;                     // OPTIONAL
+        public Guid KeyID { get; private set; }                  // OPTIONAL
 
         [JsonProperty]
-        private KeyParameters keyParameters;    // OPTIONAL
+        public KeyParameters keyParameters { get; private set; } // OPTIONAL
 
         public string JWKfromOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
         {
-            this.publicKeyUse = publicKeyUse;
-            this.keyOperations = keyOperations;
-            this.algorithm = algorithm;
-            this.keyID = Guid.NewGuid();
-            this.keyType = algorithm.KeyType;
+            this.PublicKeyUse = publicKeyUse;
+            this.KeyOperations = keyOperations;
+            this.Algorithm = algorithm;
+            this.KeyID = Guid.NewGuid();
+            this.KeyType = algorithm.KeyType;
 
             if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
                 ECParameters();
@@ -62,7 +62,7 @@ namespace CreativeCode.JWK
         private void ECParameters()
         {
             ECDsa eCDsa = ECDsa.Create();
-            var keyLength = algorithm.ToString().Split("ES")[1]; // Algorithm = 'ES' + Keylength
+            var keyLength = Algorithm.ToString().Split("ES")[1]; // Algorithm = 'ES' + Keylength
             var curveName = "P-" + keyLength;
             Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
             switch (keyLength)
@@ -118,7 +118,7 @@ namespace CreativeCode.JWK
         {
             // Key size is selected based on https://tools.ietf.org/html/rfc2104#section-3
             Regex keySizeRegex = new Regex(@"(?<shaVersion>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(algorithm.ToString());
+            var matches = keySizeRegex.Match(Algorithm.ToString());
             var shaVersionFromAlgorithmName = matches.Groups["shaVersion"].Value;
 
             HMAC hmac;
@@ -133,7 +133,7 @@ namespace CreativeCode.JWK
                     hmac = new HMACSHA512(CreateHMACKey(128));
                     break;
                 default:
-                    throw new CryptographicException("Could not create HMAC key based on algorithm " + algorithm + " (Could not parse expected SHA version)");
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm + " (Could not parse expected SHA version)");
             }
 
             keyParameters = new KeyParameters(new Dictionary<string, string>
@@ -154,11 +154,11 @@ namespace CreativeCode.JWK
             var aesKey = Aes.Create();
 
             Regex keySizeRegex = new Regex(@"(?<keySize>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(algorithm.ToString());
+            var matches = keySizeRegex.Match(Algorithm.ToString());
             var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
             var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
             if(!aesKey.ValidKeySize(aesKeySize)) {
-                throw new CryptographicException("Could not create AES key based on algorithm " + algorithm + " (Could not parse expected AES key size)");
+                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm + " (Could not parse expected AES key size)");
             }
             aesKey.KeySize = aesKeySize;
             aesKey.GenerateKey();
