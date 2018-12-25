@@ -38,7 +38,7 @@ namespace CreativeCode.JWK.TypeConverters
                         break; // Only serialize fields which are marked with "JsonProperty"
                     }
 
-                    if (customAttributeData.NamedArguments.Count() > 0) // JWK class indicated a custom name
+                    if (customAttributeData.NamedArguments.Any()) // JWK class indicated a custom name
                     {
                         var customJSONPropertyName = customAttributeData.NamedArguments[0].TypedValue.ToString();
                         WriteTrailingComma(fields, field);
