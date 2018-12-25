@@ -76,6 +76,8 @@ namespace CreativeCode.JWK
                 case "512":
                     curveOid = new Oid("1.3.132.0.35");
                     break;
+                default:
+                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm);
             }
             eCDsa.GenerateKey(ECCurve.CreateFromOid(curveOid));
 
