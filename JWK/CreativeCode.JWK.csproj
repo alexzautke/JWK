@@ -13,10 +13,11 @@
     <PackageTags>JSON;JWK;JOSE;RFC7517;Digital Signature;</PackageTags>
     <Title>CreativeCode.JWK</Title>
     <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
-    <ReleaseVersion>0.0.1</ReleaseVersion>
-    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <ReleaseVersion>0.1.0</ReleaseVersion>
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWK</PackageId>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <PackageVersion>0.1.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
