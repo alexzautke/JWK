@@ -29,7 +29,7 @@ namespace CreativeCode.JWK
         [JsonProperty]
         public KeyParameters keyParameters { get; private set; } // OPTIONAL
 
-        public string JWKfromOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
+        public string SerializeWithOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
         {
             this.PublicKeyUse = publicKeyUse;
             this.KeyOperations = keyOperations;
