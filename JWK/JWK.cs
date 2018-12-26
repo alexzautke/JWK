@@ -185,6 +185,11 @@ namespace CreativeCode.JWK
             return base64;
         }
 
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
     }
 
 }
