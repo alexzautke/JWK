@@ -59,6 +59,8 @@ namespace CreativeCode.JWK
             return JsonConvert.SerializeObject(this);
         }
 
+        #region Create digital keys
+
         private void ECParameters()
         {
             ECDsa eCDsa = ECDsa.Create();
@@ -176,6 +178,10 @@ namespace CreativeCode.JWK
             keyParameters = null;
         }
 
+        #endregion Create digital keys
+
+        #region Helper methods
+
         private string Base64urlEncode(byte[] s)
         {
             string base64 = Convert.ToBase64String(s); // Regular base64 encoder
@@ -189,6 +195,8 @@ namespace CreativeCode.JWK
         {
             return JsonConvert.SerializeObject(this);
         }
+
+        #endregion Helper methods
 
     }
 
