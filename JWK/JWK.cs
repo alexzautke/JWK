@@ -197,6 +197,15 @@ namespace CreativeCode.JWK
 
         #endregion Create digital keys
 
+        #region Crypto helper methods
+
+        public bool IsSymmetric()
+        {
+            return KeyType.Equals(KeyType.HMAC) || KeyType.Equals(KeyType.AES);
+        }
+
+        #endregion Crypto helper methods
+
         #region Helper methods
 
         private string Base64urlEncode(byte[] s)
