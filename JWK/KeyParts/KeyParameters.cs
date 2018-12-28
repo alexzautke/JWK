@@ -14,9 +14,7 @@ namespace CreativeCode.JWK.KeyParts
 
         public string Serialize(bool shouldExportPrivateKey = false)
         {
-            return values.Aggregate(new StringBuilder(),(result,
-                                                         currentParameter) => AppendKeyParameter(result, currentParameter), 
-                                                         sb => TrimTraillingComma(sb));
+            return values.Aggregate(new StringBuilder(), AppendKeyParameter, TrimTraillingComma);
         }
 
         private StringBuilder AppendKeyParameter(StringBuilder current, KeyValuePair<string, string> currentParameter)
