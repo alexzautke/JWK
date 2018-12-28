@@ -33,12 +33,9 @@ namespace CreativeCode.JWK.TypeConverters
             {
                 var propertyValue = property.GetValue(value);
                 foreach (var customAttributeData in property.CustomAttributes){
-
-                    var test = typeof(JsonPropertyAttribute);
+                
                     if (customAttributeData.AttributeType != typeof(JsonPropertyAttribute))
-                    {
                         break; // Only serialize fields which are marked with "JsonProperty"
-                    }
 
                     if (customAttributeData.NamedArguments.Any()) // JWK class indicated a custom name
                     {
