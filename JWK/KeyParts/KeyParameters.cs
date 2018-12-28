@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CreativeCode.JWK.KeyParts
 {
-    public sealed class KeyParameters
+    public sealed class KeyParameters : IJWKKeyPart
     {
         private readonly Dictionary<string, string> values;
 
@@ -12,7 +12,7 @@ namespace CreativeCode.JWK.KeyParts
             values = keyParameters;
         }
 
-        public override string ToString()
+        public string Serialize()
         {
             return values.Aggregate(new StringBuilder(),(result,
                                                          currentParameter) => AppendKeyParameter(result, currentParameter), 

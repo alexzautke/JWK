@@ -4,7 +4,7 @@ using CreativeCode.JWK.TypeConverters;
 namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.3. "key_ops" (Key Operations) Parameter
-    public sealed class KeyOperations
+    public sealed class KeyOperations : IJWKKeyPart
     {
         public static readonly KeyOperations ComputeDigitalSignature = new KeyOperations("sign");
         public static readonly KeyOperations VerifyDigitalSignature = new KeyOperations("verify");
@@ -22,7 +22,7 @@ namespace CreativeCode.JWK.KeyParts
             this.value = value;
         }
 
-        public override string ToString()
+        public string Serialize()
         {
             return value;
         }

@@ -7,7 +7,7 @@ namespace CreativeCode.JWK.KeyParts
        - Section 7.1. JSON Web Signature and Encryption Algorithms Registry
        - Section 3.1.  "alg" (Algorithm) Header Parameter Values for JWS      
     */
-    public sealed class Algorithm
+    public sealed class Algorithm : IJWKKeyPart
     {
         // HMAC
         public static readonly Algorithm HS256 = new Algorithm("HS256", KeyType.HMAC);
@@ -41,7 +41,7 @@ namespace CreativeCode.JWK.KeyParts
             this.KeyType = keyType;
         }
 
-        public override string ToString()
+        public string Serialize()
         {
             return value;
         }

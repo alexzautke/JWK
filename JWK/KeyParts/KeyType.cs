@@ -4,7 +4,7 @@ using CreativeCode.JWK.TypeConverters;
 namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 6.1. "kty" (Key Type) Parameter Values
-    public sealed class KeyType
+    public sealed class KeyType : IJWKKeyPart
     {
         public static readonly KeyType EllipticCurve = new KeyType("EC");
         public static readonly KeyType RSA = new KeyType("RSA");
@@ -19,7 +19,7 @@ namespace CreativeCode.JWK.KeyParts
             this.value = value;
         }
 
-        public override string ToString()
+        public string Serialize()
         {
             return value;
         }

@@ -23,12 +23,16 @@ namespace CreativeCode.JWK.TypeConverters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
+            if (!(value is JWK))
+                throw new ArgumentException("JWK Converter can only objects of type JWK. Found object of type " + value.GetType() + " instead.");
+
             _writer = writer;
             _writer.WriteStartObject();
 
             var type = value.GetType();
             var properties = type.GetProperties(); // Get all public properties
             var head = properties.First();
+
             foreach (var property in properties)
             {
                 var propertyValue = property.GetValue(value);
@@ -41,15 +45,16 @@ namespace CreativeCode.JWK.TypeConverters
                     {
                         var customJSONPropertyName = customAttributeData.NamedArguments[0].TypedValue.ToString();
                         WriteTrailingComma(head, property);
-                        _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
+
+                        if(propertyValue is IJWKKeyPart)
+                            _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize() + "\""); // Complex object which is part of CretaiveCode.JWK.KeyParts
+                        else
+                            _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\""); // System-provided object like GUID
                     }
                     else // Attribute handles JSON property name and formatting itself
-                    {
-                        if(propertyValue != null)
-                        {
-                            WriteTrailingComma(head, property);
-                            _writer.WriteRaw(propertyValue.ToString());
-                        }
+                    { 
+                        WriteTrailingComma(head, property);
+                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize()); // Currently, this part is only reached for KeyParameter objects
                     }
                 }
             }

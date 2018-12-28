@@ -4,7 +4,7 @@ using CreativeCode.JWK.TypeConverters;
 namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.2. "use" (Public Key Use) Parameters
-    public sealed class PublicKeyUse
+    public sealed class PublicKeyUse : IJWKKeyPart
     {
         public static readonly PublicKeyUse Signature = new PublicKeyUse("sig");
         public static readonly PublicKeyUse Encryption = new PublicKeyUse("enc");
@@ -16,7 +16,7 @@ namespace CreativeCode.JWK.KeyParts
             this.value = value;
         }
 
-        public override string ToString()
+        public string Serialize()
         {
             return value;
         }
