@@ -76,7 +76,7 @@ namespace CreativeCode.JWK
         private void ECParameters()
         {
             ECDsa eCDsa = ECDsa.Create();
-            var keyLength = Algorithm.ToString().Split("ES")[1]; // Algorithm = 'ES' + Keylength
+            var keyLength = Algorithm.Serialize().Split("ES")[1]; // Algorithm = 'ES' + Keylength
             var curveName = "P-" + keyLength;
             Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
             switch (keyLength)
@@ -134,7 +134,7 @@ namespace CreativeCode.JWK
         {
             // Key size is selected based on https://tools.ietf.org/html/rfc2104#section-3
             Regex keySizeRegex = new Regex(@"(?<shaVersion>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(Algorithm.ToString());
+            var matches = keySizeRegex.Match(Algorithm.Serialize());
             var shaVersionFromAlgorithmName = matches.Groups["shaVersion"].Value;
 
             HMAC hmac;
@@ -170,7 +170,7 @@ namespace CreativeCode.JWK
             var aesKey = Aes.Create();
 
             Regex keySizeRegex = new Regex(@"(?<keySize>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(Algorithm.ToString());
+            var matches = keySizeRegex.Match(Algorithm.Serialize());
             var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
             var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
             if(!aesKey.ValidKeySize(aesKeySize)) {
