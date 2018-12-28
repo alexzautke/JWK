@@ -32,6 +32,7 @@ namespace CreativeCode.JWK.TypeConverters
             var type = value.GetType();
             var properties = type.GetProperties(); // Get all public properties
             var head = properties.First();
+            var shouldExportPrivateKey = ((JWK)value)._shouldExportPrivateKey;
 
             foreach (var property in properties)
             {
@@ -47,14 +48,14 @@ namespace CreativeCode.JWK.TypeConverters
                         WriteTrailingComma(head, property);
 
                         if(propertyValue is IJWKKeyPart)
-                            _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize() + "\""); // Complex object which is part of CretaiveCode.JWK.KeyParts
+                            _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\""); // Complex object which is part of CretaiveCode.JWK.KeyParts
                         else
                             _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\""); // System-provided object like GUID
                     }
                     else // Attribute handles JSON property name and formatting itself
                     { 
                         WriteTrailingComma(head, property);
-                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize()); // Currently, this part is only reached for KeyParameter objects
+                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey)); // Currently, this part is only reached for KeyParameter objects
                     }
                 }
             }

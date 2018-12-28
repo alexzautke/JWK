@@ -30,9 +30,9 @@ namespace CreativeCode.JWK
         [JsonProperty]
         public KeyParameters keyParameters { get; private set; } // OPTIONAL
 
-        private bool _shouldExportPrivateKey;
+        internal bool _shouldExportPrivateKey;
 
-        public void BuildWithOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, bool shouldExportPrivateKey)
+        public void BuildWithOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
         {
             #if DEBUG
                 var performanceStopWatch = new Stopwatch();
@@ -44,7 +44,6 @@ namespace CreativeCode.JWK
             Algorithm = algorithm;
             KeyID = Guid.NewGuid();
             KeyType = algorithm.KeyType;
-            _shouldExportPrivateKey = shouldExportPrivateKey;
 
             if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
                 ECParameters();
@@ -71,6 +70,12 @@ namespace CreativeCode.JWK
             #endif
         }
 
+        public string Export(bool shouldExportPrivateKey = false)
+        {
+            _shouldExportPrivateKey = shouldExportPrivateKey;
+            return JsonConvert.SerializeObject(this);
+        }
+
         #region Create digital keys
 
         private void ECParameters()
@@ -95,7 +100,7 @@ namespace CreativeCode.JWK
             }
             eCDsa.GenerateKey(ECCurve.CreateFromOid(curveOid));
 
-            ECParameters eCParameters = eCDsa.ExportParameters(_shouldExportPrivateKey);
+            ECParameters eCParameters = eCDsa.ExportParameters(true);
             var privateKeyD = Base64urlEncode(eCParameters.D);
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
@@ -114,7 +119,7 @@ namespace CreativeCode.JWK
             const int rsaKeySize = 2056; // See recommendations: https://www.keylength.com/en/compare/
             using (var rsaKey = new RSACryptoServiceProvider(rsaKeySize)){
 
-                var rsaKeyParameters = rsaKey.ExportParameters(_shouldExportPrivateKey);
+                var rsaKeyParameters = rsaKey.ExportParameters(true);
 
                 // RSAParameters properties are big-endian, no need to reverse the byte array (See RFC7518 - 6.3.1. Parameters for RSA Public Keys)
                 var modulus = Base64urlEncode(rsaKeyParameters.Modulus);

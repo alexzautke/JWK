@@ -3,6 +3,6 @@ namespace CreativeCode.JWK
 {
     public interface IJWKKeyPart
     {
-        string Serialize();
+        string Serialize(bool shouldExportPrivateKey = false);
     }
 }

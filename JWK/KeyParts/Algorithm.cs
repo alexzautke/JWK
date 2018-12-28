@@ -41,7 +41,7 @@ namespace CreativeCode.JWK.KeyParts
             this.KeyType = keyType;
         }
 
-        public string Serialize()
+        public string Serialize(bool shouldExportPrivateKey = false)
         {
             return value;
         }

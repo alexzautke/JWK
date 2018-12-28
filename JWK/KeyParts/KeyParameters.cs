@@ -12,7 +12,7 @@ namespace CreativeCode.JWK.KeyParts
             values = keyParameters;
         }
 
-        public string Serialize()
+        public string Serialize(bool shouldExportPrivateKey = false)
         {
             return values.Aggregate(new StringBuilder(),(result,
                                                          currentParameter) => AppendKeyParameter(result, currentParameter), 

@@ -22,7 +22,7 @@ namespace CreativeCode.JWK.KeyParts
             this.value = value;
         }
 
-        public string Serialize()
+        public string Serialize(bool shouldExportPrivateKey = false)
         {
             return value;
         }
