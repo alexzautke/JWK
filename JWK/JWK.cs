@@ -109,12 +109,12 @@ namespace CreativeCode.JWK
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
 
-            keyParameters = new KeyParameters(new Dictionary<string, string>
+            keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
             {
-                {"crv", curveName},
-                {"x", publicKeyX},
-                {"y", publicKeyY},
-                {"d", privateKeyD}
+                {"crv", new Tuple<string, bool>(curveName, false)},
+                {"x", new Tuple<string, bool>(publicKeyX, false)},
+                {"y", new Tuple<string, bool>(publicKeyY, false)},
+                {"d", new Tuple<string, bool>(privateKeyD, true)}
             });
         }
 
@@ -130,11 +130,11 @@ namespace CreativeCode.JWK
                 var exponent = Base64urlEncode(rsaKeyParameters.Exponent);
                 var privateExponent = Base64urlEncode(rsaKeyParameters.D);
 
-                keyParameters = new KeyParameters(new Dictionary<string, string>
+                keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
                 {
-                    {"n", modulus},
-                    {"e", exponent},
-                    {"d", privateExponent}
+                    {"n", new Tuple<string, bool>(modulus, false)},
+                    {"e", new Tuple<string, bool>(exponent, false)},
+                    {"d", new Tuple<string, bool>(privateExponent, true)}
                 });
             }
         }
@@ -161,9 +161,10 @@ namespace CreativeCode.JWK
                     throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm + " (Could not parse expected SHA version)");
             }
 
-            keyParameters = new KeyParameters(new Dictionary<string, string>
+            var key = Base64urlEncode(hmac.Key);
+            keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
             {
-                {"k", Base64urlEncode(hmac.Key)}
+                {"k", new Tuple<string, bool>(key, true)}
             });
         }
 
@@ -188,9 +189,10 @@ namespace CreativeCode.JWK
             aesKey.KeySize = aesKeySize;
             aesKey.GenerateKey();
 
-            keyParameters = new KeyParameters(new Dictionary<string, string>
+            var key = Base64urlEncode(aesKey.Key);
+            keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
             {
-                {"k", Base64urlEncode(aesKey.Key)}
+                {"k", new Tuple<string, bool>(key, true)}
             });
         }
 
@@ -231,10 +233,10 @@ namespace CreativeCode.JWK
                 performanceStopWatch.Start();
             #endif
 
-            var jwkString = JsonConvert.SerializeObject(this);
+            var jwkString = Export(false);
 
             #if DEBUG
-                performanceStopWatch.Stop();
+            performanceStopWatch.Stop();
                 Console.WriteLine("JWK Debug Information - Serialized JWK. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
             #endif
 
