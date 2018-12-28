@@ -30,17 +30,21 @@ namespace CreativeCode.JWK
         [JsonProperty]
         public KeyParameters keyParameters { get; private set; } // OPTIONAL
 
-        public string SerializeWithOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
+        private bool _shouldExportPrivateKey;
+
+        public void BuildWithOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, bool shouldExportPrivateKey)
         {
-            this.PublicKeyUse = publicKeyUse;
-            this.KeyOperations = keyOperations;
-            this.Algorithm = algorithm;
-            this.KeyID = Guid.NewGuid();
-            this.KeyType = algorithm.KeyType;
             #if DEBUG
                 var performanceStopWatch = new Stopwatch();
                 performanceStopWatch.Start();
             #endif
+
+            PublicKeyUse = publicKeyUse;
+            KeyOperations = keyOperations;
+            Algorithm = algorithm;
+            KeyID = Guid.NewGuid();
+            KeyType = algorithm.KeyType;
+            _shouldExportPrivateKey = shouldExportPrivateKey;
 
             if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
                 ECParameters();
@@ -61,7 +65,6 @@ namespace CreativeCode.JWK
                 NONEParameters();
             }
 
-            return JsonConvert.SerializeObject(this);
             #if DEBUG
                 performanceStopWatch.Stop();
                 Console.WriteLine("JWK Debug Information - New JWK build was successfully. It took " + performanceStopWatch.ElapsedMilliseconds + "ms.");
@@ -92,7 +95,7 @@ namespace CreativeCode.JWK
             }
             eCDsa.GenerateKey(ECCurve.CreateFromOid(curveOid));
 
-            ECParameters eCParameters = eCDsa.ExportParameters(true);
+            ECParameters eCParameters = eCDsa.ExportParameters(_shouldExportPrivateKey);
             var privateKeyD = Base64urlEncode(eCParameters.D);
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
@@ -111,7 +114,7 @@ namespace CreativeCode.JWK
             const int rsaKeySize = 2056; // See recommendations: https://www.keylength.com/en/compare/
             using (var rsaKey = new RSACryptoServiceProvider(rsaKeySize)){
 
-                var rsaKeyParameters = rsaKey.ExportParameters(true);
+                var rsaKeyParameters = rsaKey.ExportParameters(_shouldExportPrivateKey);
 
                 // RSAParameters properties are big-endian, no need to reverse the byte array (See RFC7518 - 6.3.1. Parameters for RSA Public Keys)
                 var modulus = Base64urlEncode(rsaKeyParameters.Modulus);
