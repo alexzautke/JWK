@@ -14,9 +14,22 @@ namespace CreativeCode.JWK.KeyParts
 
         public override string ToString()
         {
-            return values.Aggregate(new StringBuilder(),(result, 
-                                                         currentValue) => result.AppendFormat("\"{0}\":\"{1}\",", currentValue.Key, currentValue.Value), 
-                                                         sb => sb.ToString().Trim(','));
+            return values.Aggregate(new StringBuilder(),(result,
+                                                         currentParameter) => AppendKeyParameter(result, currentParameter), 
+                                                         sb => TrimTraillingComma(sb));
+        }
+
+        private StringBuilder AppendKeyParameter(StringBuilder current, KeyValuePair<string, string> currentParameter)
+        {
+            if(currentParameter.Value != string.Empty) // Don't seralize empty JSON properties (i.e., private key parameters if "public key only" mode is requested)
+                current.AppendFormat("\"{0}\":\"{1}\",", currentParameter.Key, currentParameter.Value);
+
+            return current;
+        }
+
+        private string TrimTraillingComma(StringBuilder sb)
+        {
+            return sb.ToString().Trim(',');
         }
     }
 }
