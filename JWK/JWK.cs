@@ -73,6 +73,10 @@ namespace CreativeCode.JWK
         public string Export(bool shouldExportPrivateKey = false)
         {
             _shouldExportPrivateKey = shouldExportPrivateKey;
+
+            if (shouldExportPrivateKey && IsSymmetric())
+                throw new CryptographicException("Symetric key of type " + KeyType.Serialize() + " cannot be exported with shouldExportPrivateKey set to false.");
+
             return JsonConvert.SerializeObject(this);
         }
 
