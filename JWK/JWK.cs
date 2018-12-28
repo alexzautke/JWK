@@ -67,7 +67,7 @@ namespace CreativeCode.JWK
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine("JWK Debug Information - New JWK build was successfully. It took " + performanceStopWatch.ElapsedMilliseconds + "ms.");
+                Console.WriteLine("JWK Debug Information - New JWK build was successfully. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
             #endif
         }
 
@@ -217,7 +217,7 @@ namespace CreativeCode.JWK
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine("JWK Debug Information - Serialized JWK. It took " + performanceStopWatch.ElapsedMilliseconds + "ms.");
+                Console.WriteLine("JWK Debug Information - Serialized JWK. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
             #endif
 
             return jwkString;
