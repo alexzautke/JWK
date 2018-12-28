@@ -66,18 +66,30 @@ namespace CreativeCode.JWK
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine("JWK Debug Information - New JWK build was successfully. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
+                Console.WriteLine("Debug Information - JWK - New JWK build was successfully. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
             #endif
         }
 
         public string Export(bool shouldExportPrivateKey = false)
         {
+            #if DEBUG
+                var performanceStopWatch = new Stopwatch();
+                performanceStopWatch.Start();
+            #endif
+
             _shouldExportPrivateKey = shouldExportPrivateKey;
 
             if (shouldExportPrivateKey && IsSymmetric())
                 throw new CryptographicException("Symetric key of type " + KeyType.Serialize() + " cannot be exported with shouldExportPrivateKey set to false.");
 
-            return JsonConvert.SerializeObject(this);
+            var jwkJSON = JsonConvert.SerializeObject(this);
+
+            #if DEBUG
+                performanceStopWatch.Stop();
+                Console.WriteLine("Debug Information - JWK - Serialized JWK. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
+            #endif
+
+            return jwkJSON;
         }
 
         #region Create digital keys
@@ -228,19 +240,7 @@ namespace CreativeCode.JWK
 
         public override string ToString()
         {
-            #if DEBUG
-                var performanceStopWatch = new Stopwatch();
-                performanceStopWatch.Start();
-            #endif
-
-            var jwkString = Export(false);
-
-            #if DEBUG
-            performanceStopWatch.Stop();
-                Console.WriteLine("JWK Debug Information - Serialized JWK. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
-            #endif
-
-            return jwkString;
+            return Export(false);
         }
 
         #endregion Helper methods
