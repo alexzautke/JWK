@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Collections.Generic;
 using CreativeCode.JWK.TypeConverters;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace CreativeCode.JWK
 {
@@ -36,6 +37,10 @@ namespace CreativeCode.JWK
             this.Algorithm = algorithm;
             this.KeyID = Guid.NewGuid();
             this.KeyType = algorithm.KeyType;
+            #if DEBUG
+                var performanceStopWatch = new Stopwatch();
+                performanceStopWatch.Start();
+            #endif
 
             if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
                 ECParameters();
@@ -57,6 +62,10 @@ namespace CreativeCode.JWK
             }
 
             return JsonConvert.SerializeObject(this);
+            #if DEBUG
+                performanceStopWatch.Stop();
+                Console.WriteLine("JWK Debug Information - New JWK build was successfully. It took " + performanceStopWatch.ElapsedMilliseconds + "ms.");
+            #endif
         }
 
         #region Create digital keys
@@ -193,7 +202,19 @@ namespace CreativeCode.JWK
 
         public override string ToString()
         {
-            return JsonConvert.SerializeObject(this);
+            #if DEBUG
+                var performanceStopWatch = new Stopwatch();
+                performanceStopWatch.Start();
+            #endif
+
+            var jwkString = JsonConvert.SerializeObject(this);
+
+            #if DEBUG
+                performanceStopWatch.Stop();
+                Console.WriteLine("JWK Debug Information - Serialized JWK. It took " + performanceStopWatch.ElapsedMilliseconds + "ms.");
+            #endif
+
+            return jwkString;
         }
 
         #endregion Helper methods
