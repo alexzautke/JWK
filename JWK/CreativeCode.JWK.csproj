@@ -17,7 +17,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWK</PackageId>
     <SynchReleaseVersion>false</SynchReleaseVersion>
-    <PackageVersion>0.1.0</PackageVersion>
+    <PackageVersion>0.2.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
