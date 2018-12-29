@@ -121,12 +121,12 @@ namespace CreativeCode.JWK
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
 
-            keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
+            keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
             {
-                {"crv", new Tuple<string, bool>(curveName, false)},
-                {"x", new Tuple<string, bool>(publicKeyX, false)},
-                {"y", new Tuple<string, bool>(publicKeyY, false)},
-                {"d", new Tuple<string, bool>(privateKeyD, true)}
+                {"crv", (curveName, false)},
+                {"x", (publicKeyX, false)},
+                {"y", (publicKeyY, false)},
+                {"d", (privateKeyD, true)}
             });
         }
 
@@ -142,11 +142,11 @@ namespace CreativeCode.JWK
                 var exponent = Base64urlEncode(rsaKeyParameters.Exponent);
                 var privateExponent = Base64urlEncode(rsaKeyParameters.D);
 
-                keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
+                keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
                 {
-                    {"n", new Tuple<string, bool>(modulus, false)},
-                    {"e", new Tuple<string, bool>(exponent, false)},
-                    {"d", new Tuple<string, bool>(privateExponent, true)}
+                    {"n", (modulus, false)},
+                    {"e", (exponent, false)},
+                    {"d", (privateExponent, true)}
                 });
             }
         }
@@ -174,9 +174,9 @@ namespace CreativeCode.JWK
             }
 
             var key = Base64urlEncode(hmac.Key);
-            keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
+            keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
             {
-                {"k", new Tuple<string, bool>(key, true)}
+                {"k", (key, true)}
             });
         }
 
@@ -202,9 +202,9 @@ namespace CreativeCode.JWK
             aesKey.GenerateKey();
 
             var key = Base64urlEncode(aesKey.Key);
-            keyParameters = new KeyParameters(new Dictionary<string, Tuple<string, bool>>
+            keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
             {
-                {"k", new Tuple<string, bool>(key, true)}
+                {"k", (key, true)}
             });
         }
 

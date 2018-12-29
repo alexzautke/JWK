@@ -7,9 +7,9 @@ namespace CreativeCode.JWK.KeyParts
 {
     public sealed class KeyParameters : IJWKKeyPart
     {
-        private readonly Dictionary<string, Tuple<string, bool>> values; // Dictionary<key, Tuple<value, isPrivate>>
+        private readonly Dictionary<string, (string parameterValue, bool isPrivate)> values; // Dictionary<key, Tuple<value, isPrivate>>
 
-        public KeyParameters(Dictionary<string, Tuple<string, bool>> keyParameters){
+        public KeyParameters(Dictionary<string, (string parameterValue, bool isPrivate)> keyParameters){
             values = keyParameters;
         }
 
@@ -20,12 +20,12 @@ namespace CreativeCode.JWK.KeyParts
                                                          TrimTraillingComma);
         }
 
-        private StringBuilder AppendKeyParameter(StringBuilder current, KeyValuePair<string, Tuple<string, bool>> currentParameter, bool shouldExportPrivateKey)
+        private StringBuilder AppendKeyParameter(StringBuilder current, KeyValuePair<string, (string parameterValue, bool isPrivate)> currentParameter, bool shouldExportPrivateKey)
         {
             // Don't seralize empty JSON properties (i.e., private key parameters if "public key only" mode is requested)
             // Don't seralize if value is marked as private and shouldExportPrivateKey is set to false
-            if (currentParameter.Value.Item1 != string.Empty && (!(currentParameter.Value.Item2 && !shouldExportPrivateKey)))
-                current.AppendFormat("\"{0}\":\"{1}\",", currentParameter.Key, currentParameter.Value.Item1);
+            if (currentParameter.Value.Item1 != string.Empty && (!(currentParameter.Value.isPrivate && !shouldExportPrivateKey)))
+                current.AppendFormat("\"{0}\":\"{1}\",", currentParameter.Key, currentParameter.Value.parameterValue);
 
             return current;
         }
