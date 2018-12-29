@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using CreativeCode.JWK.KeyParts;
-using System.Security.Cryptography;
-using System.Collections.Generic;
 using CreativeCode.JWK.TypeConverters;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
 
 namespace CreativeCode.JWK
 {
