@@ -153,7 +153,7 @@ namespace CreativeCode.JWK
 
         private void HMACParameters()
         {
-            // Key size is selected based on https://tools.ietf.org/html/rfc2104#section-3
+            // Key size is selected based on NIST Special Publication 800-107 Revision 1 Recommendation for Applications Using Approved Hash Algorithms - 5.3.4 Security Effect of the HMAC Key
             Regex keySizeRegex = new Regex(@"(?<shaVersion>[1-9]+)", RegexOptions.Compiled);
             var matches = keySizeRegex.Match(Algorithm.Serialize());
             var shaVersionFromAlgorithmName = matches.Groups["shaVersion"].Value;
