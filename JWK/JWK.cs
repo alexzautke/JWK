@@ -153,24 +153,23 @@ namespace CreativeCode.JWK
 
         private void HMACParameters()
         {
-            // Key size is selected based on NIST Special Publication 800-107 Revision 1 Recommendation for Applications Using Approved Hash Algorithms - 5.3.4 Security Effect of the HMAC Key
-            Regex keySizeRegex = new Regex(@"(?<shaVersion>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(Algorithm.Serialize());
-            var shaVersionFromAlgorithmName = matches.Groups["shaVersion"].Value;
-
+            /* Key size is selected based on NIST Special Publication 800-107 Revision 1 
+               Recommendation for Applications Using Approved Hash Algorithms
+               Section 5.3.4 Security Effect of the HMAC Key
+            */           
             HMAC hmac;
-            switch (shaVersionFromAlgorithmName){
-                case "256":
+            switch (Algorithm.Serialize()){
+                case "HS256":
                     hmac = new HMACSHA256(CreateHMACKey(64));
                     break;
-                case "384":
+                case "HS384":
                     hmac = new HMACSHA384(CreateHMACKey(128));
                     break;
-                case "512":
+                case "HS512":
                     hmac = new HMACSHA512(CreateHMACKey(128));
                     break;
                 default:
-                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm + " (Could not parse expected SHA version)");
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm.Serialize() + " (Could not parse expected SHA version)");
             }
 
             var key = Base64urlEncode(hmac.Key);
