@@ -112,7 +112,7 @@ namespace CreativeCode.JWK
                     curveOid = new Oid("1.3.132.0.35");
                     break;
                 default:
-                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm);
+                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm.Serialize());
             }
             eCDsa.GenerateKey(ECCurve.CreateFromOid(curveOid));
 
@@ -195,7 +195,7 @@ namespace CreativeCode.JWK
             var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
             var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
             if(!aesKey.ValidKeySize(aesKeySize)) {
-                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm + " (Could not parse expected AES key size)");
+                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm.Serialize() + " (Could not parse expected AES key size)");
             }
             aesKey.KeySize = aesKeySize;
             aesKey.GenerateKey();
