@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.2.1 - 2019-01-07
+
+### Changed
+- Improve literature reference for selecting HMAC key size
+
+### Fixed
+- Don't throw an exception when calling ToString() when calling to string on a symmetric key. Instead, return a message indicating that ToString() is not available for symmetric keys to avoid key exposure
+- Fixed an invalid CryptographicException when calling when creating an HMAC key
+- Fixed algorithm name when creating an ECCurve key with an unknown key length.
+
 ## 0.2.0 - 2018-12-29
 
 ### Added
