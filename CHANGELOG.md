@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.2.2 - 2019-01-09
+
+### Changed
+- Change TargetFramework to netstandard2.0 for improved compability.
+
 ## 0.2.1 - 2019-01-07
 
 ### Changed
