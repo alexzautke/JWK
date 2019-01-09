@@ -241,8 +241,8 @@ namespace CreativeCode.JWK
         {
             if (!IsSymmetric())
                 return Export(false);
-            else
-                return "ToString() is not available for symetric keys. Do not expose private key information.";
+
+            return "ToString() is not available for symetric keys. Do not expose private key information.";
         }
 
         #endregion Helper methods
