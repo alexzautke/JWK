@@ -97,7 +97,7 @@ namespace CreativeCode.JWK
         private void ECParameters()
         {
             ECDsa eCDsa = ECDsa.Create();
-            var keyLength = Algorithm.Serialize().Split("ES")[1]; // Algorithm = 'ES' + Keylength
+            var keyLength = Algorithm.Serialize().Split(new string[] { "ES" }, StringSplitOptions.None)[1]; // Algorithm = 'ES' + Keylength
             var curveName = "P-" + keyLength;
             Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
             switch (keyLength)
