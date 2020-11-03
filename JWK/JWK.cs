@@ -18,7 +18,7 @@ namespace CreativeCode.JWK
         [JsonProperty(PropertyName = "use")]
         public PublicKeyUse PublicKeyUse { get; private set; }   // OPTIONAL
 
-        [JsonProperty(PropertyName = "key_ops")]
+        [JsonProperty]
         public KeyOperations KeyOperations { get; private set; } // OPTIONAL
 
         [JsonProperty(PropertyName = "alg")]
