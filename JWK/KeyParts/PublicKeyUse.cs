@@ -8,16 +8,16 @@ namespace CreativeCode.JWK.KeyParts
         public static readonly PublicKeyUse Signature = new PublicKeyUse("sig");
         public static readonly PublicKeyUse Encryption = new PublicKeyUse("enc");
 
-        private readonly string value;
+        public string KeyUse;
 
-        private PublicKeyUse(string value)
+        private PublicKeyUse(string keyUse)
         {
-            this.value = value;
+            this.KeyUse = keyUse;
         }
 
         public string Serialize(bool shouldExportPrivateKey = false)
         {
-            return value;
+            return KeyUse;
         }
     }
 }
