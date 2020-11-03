@@ -24,7 +24,7 @@ namespace CreativeCode.JWK.TypeConverters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (!(value is JWK))
-                throw new ArgumentException("JWK Converter can only objects of type JWK. Found object of type " + value.GetType() + " instead.");
+                throw new ArgumentException("JWK Converter can only objects convert of type JWK. Found object of type " + value.GetType() + " instead.");
 
             _writer = writer;
             _writer.WriteStartObject();
@@ -55,7 +55,7 @@ namespace CreativeCode.JWK.TypeConverters
                     else // Attribute handles JSON property name and formatting itself
                     { 
                         WriteTrailingComma(head, property);
-                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey)); // Currently, this part is only reached for KeyParameter objects
+                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey)); // Needed for KeyParameter and KeyOperations objects
                     }
                 }
             }
