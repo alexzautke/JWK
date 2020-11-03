@@ -31,8 +31,8 @@ Supported Key Types for creating new JWKs (with the corresponding intended algor
 ## Build
 
 The following configuration has been succesfully tested for building and running the project:
-* Visual Studio for Mac - Version 7.6.8 (build 38)
-* .Net Core - Version 2.1.302
+* Visual Studio for Mac - Version 8.7.8 (build 4)
+* .Net Core - Version 3.1.402
 
 [![Build Status](https://travis-ci.com/alexzautke/JWK.svg?branch=master)](https://travis-ci.com/alexzautke/JWK)
 
