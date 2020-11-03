@@ -5,3 +5,4 @@ script:
  - cd JWK
  - dotnet restore
  - dotnet build --configuration Release
+ - dotnet test
