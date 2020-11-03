@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using CreativeCode.JWK.TypeConverters;
+﻿using System;
 
 namespace CreativeCode.JWK.KeyParts
 {
