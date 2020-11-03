@@ -11,16 +11,16 @@ namespace CreativeCode.JWK.KeyParts
         public static readonly KeyType AES = new KeyType("oct");
         public static readonly KeyType None = new KeyType("oct");
 
-        private readonly string value;
+        public string Type;
 
-        private KeyType(string value)
+        private KeyType(string type)
         {
-            this.value = value;
+            this.Type = type;
         }
 
         public string Serialize(bool shouldExportPrivateKey = false)
         {
-            return value;
+            return Type;
         }
     }
 }
