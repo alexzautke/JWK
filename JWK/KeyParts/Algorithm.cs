@@ -31,18 +31,18 @@ namespace CreativeCode.JWK.KeyParts
         // None
         public static readonly Algorithm None = new Algorithm("none", KeyType.None);
 
-        private readonly string value;
+        private readonly string name;
         public KeyType KeyType { get; }
 
-        private Algorithm(string value, KeyType keyType)
+        private Algorithm(string name, KeyType keyType)
         {
-            this.value = value;
+            this.name = name;
             this.KeyType = keyType;
         }
 
         public string Serialize(bool shouldExportPrivateKey = false)
         {
-            return value;
+            return name;
         }
     }
 }
