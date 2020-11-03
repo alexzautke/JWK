@@ -9,20 +9,31 @@ namespace CreativeCode.JWK.KeyParts
     [JsonConverter(typeof(KeyOperationsConverter))]
     public sealed class KeyOperations : IJWKKeyPart
     {
-        public static readonly KeyOperations ComputeDigitalSignature = new KeyOperations(new[] { "sign" });
-        public static readonly KeyOperations VerifyDigitalSignature = new KeyOperations(new[] { "verify" });
-        public static readonly KeyOperations EncryptContent = new KeyOperations(new[] { "encrypt" });
-        public static readonly KeyOperations DecryptContentAndValidateDecryption = new KeyOperations(new[] { "decrypt" });
-        public static readonly KeyOperations EncryptKey = new KeyOperations(new[] { "wrapKey" });
-        public static readonly KeyOperations DecryptKeyAndValidateDecryption = new KeyOperations(new[] { "unwrapKey" });
-        public static readonly KeyOperations DeriveKey = new KeyOperations(new[] { "deriveKey" });
-        public static readonly KeyOperations DeriveBits = new KeyOperations(new[] { "deriveBits" });
+        public static readonly KeyOperations ComputeDigitalSignature = new KeyOperations("sign");
+        public static readonly KeyOperations VerifyDigitalSignature = new KeyOperations("verify");
+        public static readonly KeyOperations EncryptContent = new KeyOperations("encrypt");
+        public static readonly KeyOperations DecryptContentAndValidateDecryption = new KeyOperations("decrypt");
+        public static readonly KeyOperations EncryptKey = new KeyOperations("wrapKey");
+        public static readonly KeyOperations DecryptKeyAndValidateDecryption = new KeyOperations("unwrapKey");
+        public static readonly KeyOperations DeriveKey = new KeyOperations("deriveKey");
+        public static readonly KeyOperations DeriveBits = new KeyOperations("deriveBits");
 
         public IEnumerable<string> Operations;
 
-        private KeyOperations(IEnumerable<string> operations)
+        private KeyOperations(string operation)
         {
-            this.Operations = operations;
+            this.Operations = new[] { operation };
+        }
+
+        public KeyOperations(IEnumerable<KeyOperations> keyOperations)
+        {
+            var addedOperations = new List<string>();
+            foreach (var keyOperation in keyOperations)
+            {
+                addedOperations.AddRange(keyOperation.Operations);
+            }
+
+            Operations = addedOperations;
         }
 
         public string Serialize(bool shouldExportPrivateKey = false)
