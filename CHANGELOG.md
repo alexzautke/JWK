@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.3.0 - 2020-12-21
+
+### Changed
+- JWK.KeyParts.Algorithm.Value has been renamed to .Name
+- JWK.KeyParts.KeyParameters.Values is now publicly accessible
+- JWK.KeyParts.KeyType.Type is now publicly accessible
+- JWK.KeyParts.PublicKeyUse.KeyUse is now publicly accessible
+
+### Fixed
+
+- Issue #2 - key_ops is string, should be array
+
 ## 0.2.2 - 2019-01-09
 
 ### Changed
