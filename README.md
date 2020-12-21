@@ -17,7 +17,7 @@ Supported Key Types for creating new JWKs (with the corresponding intended algor
 |                | Algorithm | Support |
 |----------------|:-----------------------------|:-------------------------------|
 | RSA            | RS256, RS384, RS512          | :white_check_mark:
-| Eliptic Curves | ES256, ES384, ES512          | :negative_squared_cross_mark:
+| Eliptic Curves | ES256, ES384, ES512          | :white_check_mark:
 | HMAC           | HS256, HS384, HS512          | :negative_squared_cross_mark:
 | AES            | A128GCMKW, A192GCMKW, A256GCMKW    | :negative_squared_cross_mark:
 | None           | none                         | :negative_squared_cross_mark: 
