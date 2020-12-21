@@ -141,12 +141,22 @@ namespace CreativeCode.JWK
                 var modulus = Base64urlEncode(rsaKeyParameters.Modulus);
                 var exponent = Base64urlEncode(rsaKeyParameters.Exponent);
                 var privateExponent = Base64urlEncode(rsaKeyParameters.D);
+                var firstPrimeFactor = Base64urlEncode(rsaKeyParameters.P);
+                var secondPrimeFactor = Base64urlEncode(rsaKeyParameters.Q);
+                var firstFactorCRTExponent = Base64urlEncode(rsaKeyParameters.DP);
+                var secondFactorCRTExponent = Base64urlEncode(rsaKeyParameters.DQ);
+                var firstCRTCoefficient = Base64urlEncode(rsaKeyParameters.InverseQ);
 
                 keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
                 {
                     {"n", (modulus, false)},
                     {"e", (exponent, false)},
-                    {"d", (privateExponent, true)}
+                    {"d", (privateExponent, true)},
+                    {"p", (firstPrimeFactor, true)},
+                    {"q", (secondPrimeFactor, true)},
+                    {"dp", (firstFactorCRTExponent, true)},
+                    {"dq", (secondFactorCRTExponent, true)},
+                    {"qi", (firstCRTCoefficient, true)}
                 });
             }
         }
