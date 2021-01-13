@@ -39,9 +39,11 @@ namespace CreativeCode.JWK
             Algorithm = algorithm;
             KeyID = Guid.NewGuid();
             KeyType = algorithm.KeyType;
+
+            InitializeKey();
         }
 
-        public void InitializeKey()
+        private void InitializeKey()
         {
             #if DEBUG
                 var performanceStopWatch = new Stopwatch();
