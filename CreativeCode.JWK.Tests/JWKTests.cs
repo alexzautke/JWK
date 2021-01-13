@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
@@ -239,6 +240,63 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.GetValue("use").ToString().Should().Be(PublicKeyUse.Signature.KeyUse);
             parsedJWK.GetValue("key_ops").Values<string>().Count().Should().Be(2);
             parsedJWK.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(new[] { KeyOperations.ComputeDigitalSignature.Operations.FirstOrDefault(), KeyOperations.VerifyDigitalSignature.Operations.FirstOrDefault() });
+        }
+
+
+        [Fact]
+        public void JWKWithAESKeyParametersCanBeCreated()
+        {
+            PublicKeyUse keyUse = PublicKeyUse.Signature;
+            KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
+            Algorithm algorithm = Algorithm.ES256;
+            KeyParameters keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+                {
+                    {"n", ("modulus", false)},
+                    {"e", ("exponent", false)},
+                    {"d", ("privateExponent", true)},
+                    {"p", ("firstPrimeFactor", true)},
+                    {"q", ("secondPrimeFactor", true)},
+                    {"dp", ("firstFactorCRTExponent", true)},
+                    {"dq", ("secondFactorCRTExponent", true)},
+                    {"qi", ("firstCRTCoefficient", true)}
+                });
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm, keyParameters);
+
+            string jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+
+            parsedJWK.GetValue("n").ToString().Should().Be(keyParameters.Values["n"].parameterValue);
+            parsedJWK.GetValue("e").ToString().Should().Be(keyParameters.Values["e"].parameterValue);
+            parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.Values["d"].parameterValue);
+            parsedJWK.GetValue("p").ToString().Should().Be(keyParameters.Values["p"].parameterValue);
+            parsedJWK.GetValue("q").ToString().Should().Be(keyParameters.Values["q"].parameterValue);
+            parsedJWK.GetValue("dp").ToString().Should().Be(keyParameters.Values["dp"].parameterValue);
+            parsedJWK.GetValue("dq").ToString().Should().Be(keyParameters.Values["dq"].parameterValue);
+            parsedJWK.GetValue("qi").ToString().Should().Be(keyParameters.Values["qi"].parameterValue);
+        }
+
+        [Fact]
+        public void JWKWithECKeyParametersCanBeCreated()
+        {
+            PublicKeyUse keyUse = PublicKeyUse.Signature;
+            KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
+            Algorithm algorithm = Algorithm.ES256;
+            KeyParameters keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            {
+                {"crv", ("curveName", false)},
+                {"x", ("publicKeyX", false)},
+                {"y", ("publicKeyY", false)},
+                {"d", ("privateKeyD", true)}
+            });
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm, keyParameters);
+
+            string jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+
+            parsedJWK.GetValue("crv").ToString().Should().Be(keyParameters.Values["crv"].parameterValue);
+            parsedJWK.GetValue("x").ToString().Should().Be(keyParameters.Values["x"].parameterValue);
+            parsedJWK.GetValue("y").ToString().Should().Be(keyParameters.Values["y"].parameterValue);
+            parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.Values["d"].parameterValue);
         }
     }
 }

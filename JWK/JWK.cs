@@ -43,6 +43,16 @@ namespace CreativeCode.JWK
             InitializeKey();
         }
 
+        public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, KeyParameters keyParameters)
+        {
+            PublicKeyUse = publicKeyUse;
+            KeyOperations = keyOperations;
+            Algorithm = algorithm;
+            KeyID = Guid.NewGuid();
+            KeyType = algorithm.KeyType;
+            KeyParameters = keyParameters;
+        }
+
         private void InitializeKey()
         {
             #if DEBUG
