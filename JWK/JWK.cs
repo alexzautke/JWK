@@ -28,7 +28,7 @@ namespace CreativeCode.JWK
         public Guid KeyID { get; private set; }                  // OPTIONAL
 
         [JsonProperty]
-        public KeyParameters keyParameters { get; private set; } // OPTIONAL
+        public KeyParameters KeyParameters { get; private set; } // OPTIONAL
 
         internal bool _shouldExportPrivateKey;
 
@@ -136,7 +136,7 @@ namespace CreativeCode.JWK
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
 
-            keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
             {
                 {"crv", (curveName, false)},
                 {"x", (publicKeyX, false)},
@@ -162,7 +162,7 @@ namespace CreativeCode.JWK
                 var secondFactorCRTExponent = Base64urlEncode(rsaKeyParameters.DQ);
                 var firstCRTCoefficient = Base64urlEncode(rsaKeyParameters.InverseQ);
 
-                keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+                KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
                 {
                     {"n", (modulus, false)},
                     {"e", (exponent, false)},
@@ -198,7 +198,7 @@ namespace CreativeCode.JWK
             }
 
             var key = Base64urlEncode(hmac.Key);
-            keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
             {
                 {"k", (key, true)}
             });
@@ -226,7 +226,7 @@ namespace CreativeCode.JWK
             aesKey.GenerateKey();
 
             var key = Base64urlEncode(aesKey.Key);
-            keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
             {
                 {"k", (key, true)}
             });
@@ -234,7 +234,7 @@ namespace CreativeCode.JWK
 
         private void NONEParameters()
         {
-            keyParameters = null;
+            KeyParameters = null;
         }
 
         #endregion Create digital keys
