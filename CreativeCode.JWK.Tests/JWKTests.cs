@@ -12,11 +12,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithRSA256SignatureCanBeSerialized()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS256;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -44,11 +44,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithRSA384SignatureCanBeSerialized()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS384;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -76,11 +76,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithRSA512SignatureCanBeSerialized()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS512;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -108,11 +108,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKCheckRSAPrivateKeyParametersExport()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS384;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(false);
             var parsedJWK = JObject.Parse(jwkString);
@@ -140,11 +140,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithEC256SignatureCanBeSerialized()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -168,11 +168,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithEC384SignatureCanBeSerialized()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES384;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -196,11 +196,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithEC512SignatureCanBeSerialized()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES512;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -224,11 +224,11 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKCheckECPrivateKeyParametersExport()
         {
-            JWK jwk = new JWK();
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
-            jwk.BuildWithOptions(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            jwk.InitializeKey();
 
             string jwkString = jwk.Export(false);
             var parsedJWK = JObject.Parse(jwkString);

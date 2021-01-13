@@ -32,30 +32,33 @@ namespace CreativeCode.JWK
 
         internal bool _shouldExportPrivateKey;
 
-        public void BuildWithOptions(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
+        public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
+        {
+            PublicKeyUse = publicKeyUse;
+            KeyOperations = keyOperations;
+            Algorithm = algorithm;
+            KeyID = Guid.NewGuid();
+            KeyType = algorithm.KeyType;
+        }
+
+        public void InitializeKey()
         {
             #if DEBUG
                 var performanceStopWatch = new Stopwatch();
                 performanceStopWatch.Start();
             #endif
 
-            PublicKeyUse = publicKeyUse;
-            KeyOperations = keyOperations;
-            Algorithm = algorithm;
-            KeyID = Guid.NewGuid();
-            KeyType = algorithm.KeyType;
-
-            if(algorithm.KeyType.Equals(KeyType.EllipticCurve)){
+            if(Algorithm.KeyType.Equals(KeyType.EllipticCurve)){
                 ECParameters();
             }
-            else if(algorithm.KeyType.Equals(KeyType.RSA)){
+            else if(Algorithm.KeyType.Equals(KeyType.RSA)){
                 RSAParameters();
             }
-            else if (algorithm.KeyType.Equals(KeyType.HMAC))
+            else if (Algorithm.KeyType.Equals(KeyType.HMAC))
             {
                 HMACParameters();
             }
-            else if (algorithm.KeyType.Equals(KeyType.AES))
+            else if (Algorithm.KeyType.Equals(KeyType.AES))
             {
                 AESParameters();
             }
