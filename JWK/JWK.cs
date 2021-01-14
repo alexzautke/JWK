@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using CreativeCode.JWK.KeyParts;
 using CreativeCode.JWK.TypeConverters;
+using System.Linq;
 
 namespace CreativeCode.JWK
 {
@@ -68,7 +69,7 @@ namespace CreativeCode.JWK
             KeyOperations = keyOperations;
             Algorithm = algorithm;
             KeyID = Guid.NewGuid();
-            KeyType = algorithm.KeyType;
+            KeyType = DeriveKeyType(algorithm);
             KeyParameters = keyParameters;
         }
 
@@ -79,23 +80,24 @@ namespace CreativeCode.JWK
                 performanceStopWatch.Start();
             #endif
 
-            if(Algorithm.KeyType.Equals(KeyType.EllipticCurve)){
-                ECParameters();
-            }
-            else if(Algorithm.KeyType.Equals(KeyType.RSA)){
-                RSAParameters();
-            }
-            else if (Algorithm.KeyType.Equals(KeyType.HMAC))
+            var keyTypeIndication = Algorithm.Name.FirstOrDefault();
+            switch (keyTypeIndication)
             {
-                HMACParameters();
-            }
-            else if (Algorithm.KeyType.Equals(KeyType.AES))
-            {
-                AESParameters();
-            }
-            else
-            {
-                NONEParameters();
+                case 'H':
+                    HMACParameters();
+                    break;
+                case 'R':
+                    RSAParameters();
+                    break;
+                case 'A':
+                    AESParameters();
+                    break;
+                case 'E':
+                    ECParameters();
+                    break;
+                default:
+                    NONEParameters();
+                    break;
             }
 
             #if DEBUG
@@ -262,7 +264,7 @@ namespace CreativeCode.JWK
 
         public bool IsSymmetric()
         {
-            return KeyType.Equals(KeyType.HMAC) || KeyType.Equals(KeyType.AES);
+            return Algorithm.IsSymetric;
         }
 
         #endregion Crypto helper methods
