@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CreativeCode.JWK.TypeConverters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
@@ -19,6 +20,8 @@ namespace CreativeCode.JWK.KeyParts
         public static readonly KeyOperations DeriveBits = new KeyOperations("deriveBits");
 
         public IEnumerable<string> Operations;
+
+        private KeyOperations() { } // Used only for deserialization
 
         private KeyOperations(string operation)
         {
@@ -39,6 +42,11 @@ namespace CreativeCode.JWK.KeyParts
         public string Serialize(bool shouldExportPrivateKey = false)
         {
             return JsonConvert.SerializeObject(this);
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            throw new NotImplementedException();
         }
     }
 }

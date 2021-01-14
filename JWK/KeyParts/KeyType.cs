@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
@@ -15,9 +16,25 @@ namespace CreativeCode.JWK.KeyParts
 
         public string Type;
 
+        private KeyType() { } // Used only for deserialization
+
         private KeyType(string type)
         {
             this.Type = type;
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            if (jwkRepresentation is null)
+                throw new NotSupportedException("Cannot deserialize null value");
+
+            return jwkRepresentation.ToString() switch
+            {
+                EC_VALUE => EllipticCurve,
+                RSA_VALUE => RSA,
+                OCT_VALUE => OCT,
+                _ => null
+            };
         }
 
         public string Serialize(bool shouldExportPrivateKey = false)

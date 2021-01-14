@@ -26,7 +26,7 @@ namespace CreativeCode.JWK
         public Algorithm Algorithm { get; private set; }         // OPTIONAL
 
         [JsonProperty(PropertyName = "kid")]
-        public Guid KeyID { get; private set; }                  // OPTIONAL
+        public string KeyID { get; private set; }                // OPTIONAL
 
         [JsonProperty]
         public KeyParameters KeyParameters { get; private set; } // OPTIONAL
@@ -45,10 +45,20 @@ namespace CreativeCode.JWK
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
             Algorithm = algorithm;
-            KeyID = Guid.NewGuid();
+            KeyID = Guid.NewGuid().ToString();
             KeyType = DeriveKeyType(algorithm);
 
             InitializeKey();
+        }
+
+        public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, KeyParameters keyParameters)
+        {
+            PublicKeyUse = publicKeyUse;
+            KeyOperations = keyOperations;
+            Algorithm = algorithm;
+            KeyID = Guid.NewGuid().ToString();
+            KeyType = DeriveKeyType(algorithm);
+            KeyParameters = keyParameters;
         }
 
         private KeyType DeriveKeyType(Algorithm algorithm)
@@ -61,16 +71,6 @@ namespace CreativeCode.JWK
                 return KeyType.EllipticCurve;
 
             return null;
-        }
-
-        public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, KeyParameters keyParameters)
-        {
-            PublicKeyUse = publicKeyUse;
-            KeyOperations = keyOperations;
-            Algorithm = algorithm;
-            KeyID = Guid.NewGuid();
-            KeyType = DeriveKeyType(algorithm);
-            KeyParameters = keyParameters;
         }
 
         private void InitializeKey()

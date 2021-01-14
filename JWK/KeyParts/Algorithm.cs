@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
@@ -9,28 +10,41 @@ namespace CreativeCode.JWK.KeyParts
     public sealed class Algorithm : IJWKKeyPart
     {
         // HMAC
-        public static readonly Algorithm HS256 = new Algorithm("HS256", true);
-        public static readonly Algorithm HS384 = new Algorithm("HS384", true);
-        public static readonly Algorithm HS512 = new Algorithm("HS512", true);
+        private const string HS256_VALUE = "HS256";
+        private const string HS384_VALUE = "HS384";
+        private const string HS512_VALUE = "HS512";
+        public static readonly Algorithm HS256 = new Algorithm(HS256_VALUE, true);
+        public static readonly Algorithm HS384 = new Algorithm(HS384_VALUE, true);
+        public static readonly Algorithm HS512 = new Algorithm(HS512_VALUE, true);
 
         // RSA
         // Support for PS256, PS384, PS512 is not planned.
-        public static readonly Algorithm RS256 = new Algorithm("RS256", false);
-        public static readonly Algorithm RS384 = new Algorithm("RS384", false);
-        public static readonly Algorithm RS512 = new Algorithm("RS512", false);
+        private const string RS256_VALUE = "RS256";
+        private const string RS384_VALUE = "RS384";
+        private const string RS512_VALUE = "RS512";
+        public static readonly Algorithm RS256 = new Algorithm(RS256_VALUE, false);
+        public static readonly Algorithm RS384 = new Algorithm(RS384_VALUE, false);
+        public static readonly Algorithm RS512 = new Algorithm(RS512_VALUE, false);
 
         // Elliptic Curve
-        public static readonly Algorithm ES256 = new Algorithm("ES256", false);
-        public static readonly Algorithm ES384 = new Algorithm("ES384", false);
-        public static readonly Algorithm ES512 = new Algorithm("ES512", false);
+        private const string ES256_VALUE = "ES256";
+        private const string ES384_VALUE = "ES384";
+        private const string ES512_VALUE = "ES512";
+        public static readonly Algorithm ES256 = new Algorithm(ES256_VALUE, false);
+        public static readonly Algorithm ES384 = new Algorithm(ES384_VALUE, false);
+        public static readonly Algorithm ES512 = new Algorithm(ES512_VALUE, false);
 
         // AES
-        public static readonly Algorithm A128GCMKW = new Algorithm("A128GCMKW", true);
-        public static readonly Algorithm A192GCMKW = new Algorithm("A192GCMKW", true);
-        public static readonly Algorithm A256GCMKW = new Algorithm("A256GCMKW", true);
+        private const string A128GCMKW_VALUE = "A128GCMKW";
+        private const string A192GCMKW_VALUE = "A192GCMKW";
+        private const string A256GCMKW_VALUE = "A256GCMKW";
+        public static readonly Algorithm A128GCMKW = new Algorithm(A128GCMKW_VALUE, true);
+        public static readonly Algorithm A192GCMKW = new Algorithm(A192GCMKW_VALUE, true);
+        public static readonly Algorithm A256GCMKW = new Algorithm(A256GCMKW_VALUE, true);
 
         // None
-        public static readonly Algorithm None = new Algorithm("none", false);
+        private const string NONE_VALUE = "none";
+        public static readonly Algorithm None = new Algorithm(NONE_VALUE, false);
 
         public string Name { get; }
         public bool IsSymetric { get; }
@@ -46,6 +60,35 @@ namespace CreativeCode.JWK.KeyParts
         public string Serialize(bool shouldExportPrivateKey = false)
         {
             return Name;
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            if (jwkRepresentation is null)
+                throw new NotSupportedException("Cannot deserialize null value");
+
+            return jwkRepresentation.ToString() switch
+            {
+                HS256_VALUE => HS256,
+                HS384_VALUE => HS384,
+                HS512_VALUE => HS512,
+
+                RS256_VALUE => RS256,
+                RS384_VALUE => RS384,
+                RS512_VALUE => RS512,
+
+                ES256_VALUE => ES256,
+                ES384_VALUE => ES384,
+                ES512_VALUE => ES512,
+
+                A128GCMKW_VALUE => A128GCMKW,
+                A192GCMKW_VALUE => A192GCMKW_VALUE,
+                A256GCMKW_VALUE => A256GCMKW_VALUE,
+
+                NONE_VALUE => None,
+
+                _ => null
+            };
         }
     }
 }

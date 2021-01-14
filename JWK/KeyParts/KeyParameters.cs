@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
     public sealed class KeyParameters : IJWKKeyPart
     {
         public Dictionary<string, (string parameterValue, bool isPrivate)> Values { get; } // Dictionary<key, Tuple<value, isPrivate>>
+
+        private KeyParameters() { } // Used only for deserialization
 
         public KeyParameters(Dictionary<string, (string parameterValue, bool isPrivate)> keyParameters){
             if (keyParameters == null)
@@ -36,6 +39,11 @@ namespace CreativeCode.JWK.KeyParts
         private string TrimTraillingComma(StringBuilder sb)
         {
             return sb.ToString().Trim(',');
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            throw new NotImplementedException();
         }
     }
 }

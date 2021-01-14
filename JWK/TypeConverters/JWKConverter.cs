@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.TypeConverters
 {
@@ -17,14 +18,48 @@ namespace CreativeCode.JWK.TypeConverters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            // No support for deserialization
-            throw new NotImplementedException();
+            if (!(objectType == typeof(JWK)))
+                throw new ArgumentException("JWK Converter can only objects deserialize of type 'JWK'. Found object of type " + objectType.Name + " instead.");
+
+            JObject jo = JObject.Load(reader);
+            var jwk = Activator.CreateInstance(objectType, true) as JWK;
+
+            var properties = objectType.GetProperties(); // Get all public properties
+            foreach (var property in properties)
+            {
+                foreach (var customAttributeData in property.CustomAttributes)
+                {
+                    if (customAttributeData.AttributeType != typeof(JsonPropertyAttribute))
+                        break; // Only deserialize fields which are marked with "JsonProperty"
+
+                    // Get token by name indicated by JsonPropertyAttribute
+                    var propertyNameArgument = customAttributeData.NamedArguments.FirstOrDefault(n => n.MemberName == "PropertyName");
+                    var propertyName = propertyNameArgument.TypedValue.Value as string;
+                    if (propertyName is null)
+                        break;
+
+                    jo.TryGetValue(propertyName, out var token);
+
+                    if (property.PropertyType.GetInterfaces().Any(i => i == typeof(IJWKKeyPart))) // Custom Deserialization needed
+                    {
+                        var instance = Activator.CreateInstance(property.PropertyType, true) as IJWKKeyPart;
+                        var instanceValue = instance.Deserialize(token);
+                        property.SetValue(jwk, instanceValue);
+                    }
+                    else
+                    {
+                        property.SetValue(jwk, token.ToString());
+                    }
+                }
+            }
+
+            return jwk;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (!(value is JWK))
-                throw new ArgumentException("JWK Converter can only objects convert of type JWK. Found object of type " + value.GetType() + " instead.");
+                throw new ArgumentException("JWK Converter can only objects serialize the type 'JWK'. Found object of type " + value.GetType() + " instead.");
 
             _writer = writer;
             _writer.WriteStartObject();
