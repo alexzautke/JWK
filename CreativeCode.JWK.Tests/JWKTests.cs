@@ -16,7 +16,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS256;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -47,7 +47,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS384;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -78,7 +78,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS512;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -109,7 +109,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS384;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(false);
             var parsedJWK = JObject.Parse(jwkString);
@@ -140,7 +140,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -167,7 +167,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES384;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -194,7 +194,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES512;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -221,7 +221,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(false);
             var parsedJWK = JObject.Parse(jwkString);
@@ -246,6 +246,7 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithAESKeyParametersCanBeCreated()
         {
+            KeyType keyType = KeyType.RSA;
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
@@ -260,7 +261,7 @@ namespace CreativeCode.JWK.Tests
                     {"dq", ("secondFactorCRTExponent", true)},
                     {"qi", ("firstCRTCoefficient", true)}
                 });
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm, keyParameters);
+            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -278,6 +279,7 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithECKeyParametersCanBeCreated()
         {
+            KeyType keyType = KeyType.EllipticCurve;
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
@@ -288,7 +290,7 @@ namespace CreativeCode.JWK.Tests
                 {"y", ("publicKeyY", false)},
                 {"d", ("privateKeyD", true)}
             });
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm, keyParameters);
+            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
