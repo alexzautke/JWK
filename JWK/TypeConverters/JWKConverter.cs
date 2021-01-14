@@ -72,6 +72,9 @@ namespace CreativeCode.JWK.TypeConverters
             foreach (var property in properties)
             {
                 var propertyValue = property.GetValue(value);
+                if (propertyValue is null)
+                    continue;
+
                 foreach (var customAttribute in property.CustomAttributes){
                 
                     if (customAttribute.AttributeType != typeof(JsonPropertyAttribute))

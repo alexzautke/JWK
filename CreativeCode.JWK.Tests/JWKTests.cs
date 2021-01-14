@@ -16,7 +16,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS256;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -47,7 +47,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS384;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -78,7 +78,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS512;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -109,7 +109,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.RS384;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(false);
             var parsedJWK = JObject.Parse(jwkString);
@@ -140,7 +140,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -167,7 +167,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES384;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -194,7 +194,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES512;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -221,7 +221,7 @@ namespace CreativeCode.JWK.Tests
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
             string jwkString = jwk.Export(false);
             var parsedJWK = JObject.Parse(jwkString);
@@ -246,6 +246,7 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithAESKeyParametersCanBeCreated()
         {
+            KeyType keyType = KeyType.RSA;
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
@@ -260,7 +261,7 @@ namespace CreativeCode.JWK.Tests
                     {"dq", ("secondFactorCRTExponent", true)},
                     {"qi", ("firstCRTCoefficient", true)}
                 });
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm, keyParameters);
+            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -278,6 +279,7 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithECKeyParametersCanBeCreated()
         {
+            KeyType keyType = KeyType.EllipticCurve;
             PublicKeyUse keyUse = PublicKeyUse.Signature;
             KeyOperations keyOperations = new KeyOperations(new[] { KeyOperations.ComputeDigitalSignature, KeyOperations.VerifyDigitalSignature });
             Algorithm algorithm = Algorithm.ES256;
@@ -288,7 +290,7 @@ namespace CreativeCode.JWK.Tests
                 {"y", ("publicKeyY", false)},
                 {"d", ("privateKeyD", true)}
             });
-            JWK jwk = new JWK(keyUse, keyOperations, algorithm, keyParameters);
+            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm);
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -303,6 +305,29 @@ namespace CreativeCode.JWK.Tests
         public void JWKCanBeDeserialized()
         {
             var jwk = new JWK("{\"kty\":\"RSA\",\"use\":\"sig\",\"key_ops\":[\"sign\",\"verify\"],\"alg\":\"RS256\",\"kid\":\"e9515a90 - 7479 - 4ff8 - a3b1 - 23aaef3b5675\",\"n\":\"4W_ciNjvogFBPf9BYd9jySsrsN6gdosZMAWDi79bZIpYXPHSynbNQUcDe2tSwGKgG9d1ak - jLtZ37SOcC0s1C6W5jAGBHuA - 2Oscpa1DZPXrShrDW0wbO2wbBW17pY9rLlnFel - 26eE48U0utDdDFCxBBOsWj382sDJzfqLj6DTKBn9r1wDvbRLbWecvZF5uTG392KoO5sNvwwnAhRzo1HX7hPTr5zDOBkfKQolIo99g5Gq9k - _yqDWmRC0mxO6SOfFdrxSMTgCUTyZA_jQXvn7OrSO28yvKdpnrHihGExHubA - m30a21LBQlomovYZiXJ7mlvUnzFxxa7XOsbA1sFU\",\"e\":\"AQAB\",\"d\":\"BAOo6qrqQXlCPydfc621qixhn8mnE9VQQoGmoQNsTjMEdcs8lKxe5U2tazIzDAf1j - lbRuRaJIhfJFLhAXZ6YFW4Ix0XvoQBun0dSnn2XELgyLYHSoXlaj53kLYtYHpYTz_7 - zzfFfUTvYBBV6YwRJixI7RH95AtWh_b3KJr6oOdmGzul7XcHJ0rcPAKfRXhUrDpjS - iZ3TOAEImQHBwHCjsiQPSDlz3jlUlG - LnE9l3PH49rKFjwc6RIfhKt0jBuwnxE3cX87ux - cFBdo_lIyv2yH - watb9SO1WqxQA2rXBXrWWKitLMhaQLFdHIZEf1lHN7VA_UD9ty9p8CZC21NU\",\"p\":\"D0X1M5HmLBNMSvxA_uF - KQ2YnhDmt4ldHiKLjjpJnvJLwXf - TDbApIfHnkRnHxd9adLO4IaAlqL3_oVlS1ZuEijy6auzfwbrcgfsuEYR_k7fG4T8K9TDS2FWe24xFkJgVdRpuMiAt0wZZEexCv2oIFDM0idXrUl7Ikq6RL3kOwob\",\"q\":\"DsKeLZl2Du2RBszDDWKMYhORGR93 - CPhSGZT91 - Dic6iSWtumfIGAbkjEFiCeMs4tJwktgiYS76IsQ9qCZdrcBj2h - LgMUqrdqKmSq2 - krsQPpJxfPadHewa8T2_e48wXzxmx8Dmmoqd4q1LPbOHFMJpY2HBwXopeIbtFa1vUdZP\",\"dp\":\"DDNG5nXyVlzoAbI1PSTlQWfx9LntgskAkDTqI6fd7VEBQL9YbIsEIamwxHVBpq196g2SYfovN6Vg0ni - bIrTDECXoh8dGChv5Tv9VUnrz6gzQmldgqnHgyxzB9AC - BP3njg6Z3gKkeEBG4DFJNFw_rdslacFu4_KA5 - L4aOKb7rn\",\"dq\":\"Dmzw0Rohwvc1_VJT85n0H8qFzerugkr2255 - w87KrP2RqHXh830Rl8 - MUGZgpZPgSMwuKOZ_ic - eooWxGcyuSTFsiGQYvrP - ngTaxzPFhHxkpPLVDc - swNjHgCzcHvNT0FAlF2cVOcbuBeNeHOB_za8v9txM1D4Dl_MudTg7Ct2L\",\"qi\":\"Aw3In2d6QWQ95rRJwAVAXuWJKubLqSxXTPVu7ueyn1PGMyzK7 - 6nFNfa1WBpCE4LQ - Ep3eZ2GhSZzN888iixnkNNuaXToUzk0dBEyNM7WDg8tGuyvd5yaJd6wj8q6prYUJGxk7V0mDMhSsA6uttRYe9rbemye6eUNwQIvfmjkbQl\"}");
+        }
+
+        public void JWKWithMinimalRequiredElementsCanBeCreated()
+        {
+            KeyType keyType = KeyType.EllipticCurve;
+            KeyParameters keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            {
+                {"crv", ("curveName", false)},
+                {"x", ("publicKeyX", false)},
+                {"y", ("publicKeyY", false)},
+                {"d", ("privateKeyD", true)}
+            });
+
+            JWK jwk = new JWK(keyType, keyParameters);
+
+            string jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+
+            parsedJWK.GetValue("kty").ToString().Should().Be(KeyType.EllipticCurve.Type);
+            parsedJWK.GetValue("crv").ToString().Should().Be(keyParameters.Values["crv"].parameterValue);
+            parsedJWK.GetValue("x").ToString().Should().Be(keyParameters.Values["x"].parameterValue);
+            parsedJWK.GetValue("y").ToString().Should().Be(keyParameters.Values["y"].parameterValue);
+            parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.Values["d"].parameterValue);
         }
     }
 }

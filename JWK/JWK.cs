@@ -41,7 +41,25 @@ namespace CreativeCode.JWK
             JsonConvert.DeserializeObject<JWK>(jwk);
         }
 
-        public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
+        public JWK(KeyType keyType, KeyParameters keyParameters)
+        {
+            if (keyType is null)
+                throw new ArgumentNullException("KeyType MUST be provided");
+            if (keyParameters is null)
+                throw new ArgumentNullException("KeyParameters MUST be provided");
+
+            KeyType = keyType;
+            KeyParameters = keyParameters;
+        }
+
+        public JWK(KeyType keyType, KeyParameters keyParameters, PublicKeyUse publicKeyUse = null, KeyOperations keyOperations = null, Algorithm algorithm = null): this(keyType, keyParameters)
+        {
+            PublicKeyUse = publicKeyUse;
+            KeyOperations = keyOperations;
+            Algorithm = algorithm;
+        }
+
+        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse, KeyOperations keyOperations)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
