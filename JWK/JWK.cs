@@ -52,7 +52,7 @@ namespace CreativeCode.JWK
             KeyParameters = keyParameters;
         }
 
-        public JWK(KeyType keyType, KeyParameters keyParameters, PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm): this(keyType, keyParameters)
+        public JWK(KeyType keyType, KeyParameters keyParameters, PublicKeyUse publicKeyUse = null, KeyOperations keyOperations = null, Algorithm algorithm = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
@@ -64,7 +64,7 @@ namespace CreativeCode.JWK
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
             Algorithm = algorithm;
-            KeyID = Guid.NewGuid().ToString();
+            KeyID = Guid.NewGuid();
             KeyType = DeriveKeyType(algorithm);
 
             InitializeKey();

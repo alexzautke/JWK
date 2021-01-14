@@ -300,5 +300,29 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.GetValue("y").ToString().Should().Be(keyParameters.Values["y"].parameterValue);
             parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.Values["d"].parameterValue);
         }
+
+        [Fact]
+        public void JWKWithMinimalRequiredElementsCanBeCreated()
+        {
+            KeyType keyType = KeyType.EllipticCurve;
+            KeyParameters keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            {
+                {"crv", ("curveName", false)},
+                {"x", ("publicKeyX", false)},
+                {"y", ("publicKeyY", false)},
+                {"d", ("privateKeyD", true)}
+            });
+
+            JWK jwk = new JWK(keyType, keyParameters);
+
+            string jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+
+            parsedJWK.GetValue("kty").ToString().Should().Be(KeyType.EllipticCurve.Type);
+            parsedJWK.GetValue("crv").ToString().Should().Be(keyParameters.Values["crv"].parameterValue);
+            parsedJWK.GetValue("x").ToString().Should().Be(keyParameters.Values["x"].parameterValue);
+            parsedJWK.GetValue("y").ToString().Should().Be(keyParameters.Values["y"].parameterValue);
+            parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.Values["d"].parameterValue);
+        }
     }
 }
