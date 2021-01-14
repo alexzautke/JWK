@@ -32,15 +32,34 @@ namespace CreativeCode.JWK
 
         internal bool _shouldExportPrivateKey;
 
+        private JWK() { } // Used only for deserialization
+
+        public JWK(string jwk)
+        {
+            JsonConvert.DeserializeObject<JWK>(jwk);
+        }
+
         public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
             Algorithm = algorithm;
             KeyID = Guid.NewGuid();
-            KeyType = algorithm.KeyType;
+            KeyType = DeriveKeyType(algorithm);
 
             InitializeKey();
+        }
+
+        private KeyType DeriveKeyType(Algorithm algorithm)
+        {
+            if (algorithm.IsSymetric)
+                return KeyType.OCT;
+            if (algorithm == Algorithm.RS256 || algorithm == Algorithm.RS384 || algorithm == Algorithm.RS512)
+                return KeyType.RSA;
+            if (algorithm == Algorithm.ES256 || algorithm == Algorithm.ES384 || algorithm == Algorithm.ES512)
+                return KeyType.EllipticCurve;
+
+            return null;
         }
 
         public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, KeyParameters keyParameters)
