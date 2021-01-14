@@ -72,25 +72,29 @@ namespace CreativeCode.JWK.TypeConverters
             foreach (var property in properties)
             {
                 var propertyValue = property.GetValue(value);
-                foreach (var customAttributeData in property.CustomAttributes){
+                foreach (var customAttribute in property.CustomAttributes){
                 
-                    if (customAttributeData.AttributeType != typeof(JsonPropertyAttribute))
+                    if (customAttribute.AttributeType != typeof(JsonPropertyAttribute))
                         break; // Only serialize fields which are marked with "JsonProperty"
 
-                    if (customAttributeData.NamedArguments.Any()) // JWK class indicated a custom name
+                    if (customAttribute.NamedArguments.Any(n => n.MemberName == "PropertyName")) // JWK class indicated a custom name
                     {
-                        var customJSONPropertyName = customAttributeData.NamedArguments[0].TypedValue.ToString();
+                        var customJSONPropertyName = customAttribute.NamedArguments[0].TypedValue.ToString();
                         WriteTrailingComma(head, property);
 
-                        if(propertyValue is IJWKKeyPart)
-                            _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\""); // Complex object which is part of CretaiveCode.JWK.KeyParts
+                        if(property.CustomAttributes.Any(a => a.AttributeType == typeof(JsonConverterAttribute))) // Let the type handle the serialization itself as there is a custom serialization needed
+                            _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey));
+
+                        else if(propertyValue is IJWKKeyPart)
+                            _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
+
                         else
-                            _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\""); // System-provided object like GUID
+                            _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                     }
-                    else // Attribute handles JSON property name and formatting itself
+                    else // Attribute is split over multiple elements, therefore let the class handle it itself (e.g. KeyParameters)
                     { 
                         WriteTrailingComma(head, property);
-                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey)); // Needed for KeyParameter and KeyOperations objects
+                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey));
                     }
                 }
             }
