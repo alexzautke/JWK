@@ -262,7 +262,7 @@ namespace CreativeCode.JWK.Tests
                     {RSAKeyParameterDQ, "secondFactorCRTExponent"},
                     {RSAKeyParameterQI, "firstCRTCoefficient"}
                 };
-            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -275,6 +275,7 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.GetValue("dp").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterDP));
             parsedJWK.GetValue("dq").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterDQ));
             parsedJWK.GetValue("qi").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterQI));
+            parsedJWK.GetValue("kid").ToString().Should().Be("test");
         }
 
         [Fact]
@@ -291,7 +292,7 @@ namespace CreativeCode.JWK.Tests
                 {ECKeyParameterY, "publicKeyY"},
                 {ECKeyParameterD, "privateKeyD"}
             };
-            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm);
+            JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
             string jwkString = jwk.Export(true);
             var parsedJWK = JObject.Parse(jwkString);
@@ -300,6 +301,7 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.GetValue("x").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterX));
             parsedJWK.GetValue("y").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterY));
             parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterD));
+            parsedJWK.GetValue("kid").ToString().Should().Be("test");
         }
 
         [Fact]
