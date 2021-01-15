@@ -41,7 +41,7 @@ namespace CreativeCode.JWK.TypeConverters
 
         public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
         {
-            var operations = propertyValue as HashSet<KeyOperation>;
+            var operations = new HashSet<KeyOperation>(propertyValue as IEnumerable<KeyOperation>);
             var sb = new StringBuilder();
             var sw = new StringWriter(sb);
             var writer = new JsonTextWriter(sw);
