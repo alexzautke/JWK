@@ -38,6 +38,11 @@ namespace CreativeCode.JWK
 
         private JWK() { } // Used only for deserialization
 
+        /// <summary>
+        /// Deserialize a JWK from string
+        /// Mandatory elements MUST be provided
+        /// </summary>
+        /// <param name="jwk"></param>
         public JWK(string jwk)
         {
             try
@@ -57,6 +62,11 @@ namespace CreativeCode.JWK
             }
         }
 
+        /// <summary>
+        /// Create a JWK using only required elements
+        /// </summary>
+        /// <param name="keyType"></param>
+        /// <param name="keyParameters"></param>
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters)
         {
             if (keyType is null)
@@ -68,6 +78,15 @@ namespace CreativeCode.JWK
             KeyParameters = keyParameters;
         }
 
+        /// <summary>
+        /// Create a JWK with optionally all elements
+        /// </summary>
+        /// <param name="keyType"></param>
+        /// <param name="keyParameters"></param>
+        /// <param name="publicKeyUse"></param>
+        /// <param name="keyOperations"></param>
+        /// <param name="algorithm"></param>
+        /// <param name="keyId"></param>
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null, Algorithm algorithm = null, string keyId = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
@@ -76,6 +95,12 @@ namespace CreativeCode.JWK
             KeyID = keyId;
         }
 
+        /// <summary>
+        /// Create a JWK by only providing a specific algorithm. A new key for the corresponding algorithm is generated in the background
+        /// </summary>
+        /// <param name="algorithm"></param>
+        /// <param name="publicKeyUse"></param>
+        /// <param name="keyOperations"></param>
         public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null)
         {
             PublicKeyUse = publicKeyUse;
@@ -85,16 +110,6 @@ namespace CreativeCode.JWK
             KeyType = DeriveKeyType(algorithm);
 
             InitializeKey();
-        }
-
-        public JWK(PublicKeyUse publicKeyUse, IEnumerable<KeyOperation> keyOperations, Algorithm algorithm, Dictionary<KeyParameter, string> keyParameters)
-        {
-            PublicKeyUse = publicKeyUse;
-            KeyOperations = new HashSet<KeyOperation>(keyOperations);
-            Algorithm = algorithm;
-            KeyID = Guid.NewGuid().ToString();
-            KeyType = DeriveKeyType(algorithm);
-            KeyParameters = keyParameters;
         }
 
         private KeyType DeriveKeyType(Algorithm algorithm)
