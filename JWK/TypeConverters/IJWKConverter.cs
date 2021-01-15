@@ -1,9 +1,9 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 
-namespace CreativeCode.JWK
+namespace CreativeCode.JWK.TypeConverters
 {
-    public interface IJWKKeyPart
+    internal interface IJWKConverter
     {
         string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null);
         object Deserialize(JToken jwkRepresentation);

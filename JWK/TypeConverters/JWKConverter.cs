@@ -42,20 +42,20 @@ namespace CreativeCode.JWK.TypeConverters
                         var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
                         if (customConverterType is { } && propertyName is { })
                         {
-                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKKeyPart;
+                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKConverter;
                             var instanceValue = instance.Deserialize(token);
                             property.SetValue(jwk, instanceValue);
                         }
                         if (customConverterType is { } && propertyName is null)
                         {
-                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKKeyPart;
+                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKConverter;
                             var instanceValue = instance.Deserialize(jo);
                             property.SetValue(jwk, instanceValue);
                         }
                     }
-                    else if (property.PropertyType.GetInterfaces().Any(i => i == typeof(IJWKKeyPart)))
+                    else if (property.PropertyType.GetInterfaces().Any(i => i == typeof(IJWKConverter)))
                     {
-                        var instance = Activator.CreateInstance(property.PropertyType, true) as IJWKKeyPart;
+                        var instance = Activator.CreateInstance(property.PropertyType, true) as IJWKConverter;
                         var instanceValue = instance.Deserialize(token);
                         property.SetValue(jwk, instanceValue);
                     }
@@ -102,12 +102,12 @@ namespace CreativeCode.JWK.TypeConverters
                         var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
                         if(customConverterType is { })
                         {
-                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKKeyPart;
+                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKConverter;
                             _writer.WriteRaw(instance.Serialize(shouldExportPrivateKey, propertyValue));
                         }
                     }
-                    else if (propertyValue is IJWKKeyPart)
-                        _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
+                    else if (propertyValue is IJWKConverter)
+                        _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKConverter)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
 
                     else // Serialize system types directly
                         _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");

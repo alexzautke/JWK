@@ -1,10 +1,11 @@
 ﻿using System;
+using CreativeCode.JWK.TypeConverters;
 using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.2. "use" (Public Key Use) Parameters
-    public sealed class PublicKeyUse : IJWKKeyPart
+    public sealed class PublicKeyUse : IJWKConverter
     {
         private const string SIG_VALUE = "sig";
         private const string ENC_VALUE = "enc";

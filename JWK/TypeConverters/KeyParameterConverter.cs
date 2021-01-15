@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.TypeConverters
 {
-    internal class KeyParameterConverter : IJWKKeyPart
+    internal class KeyParameterConverter : IJWKConverter
     {
         public object Deserialize(JToken jwkRepresentation)
         {

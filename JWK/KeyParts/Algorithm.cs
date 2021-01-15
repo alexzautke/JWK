@@ -1,4 +1,5 @@
 ﻿using System;
+using CreativeCode.JWK.TypeConverters;
 using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
@@ -7,7 +8,7 @@ namespace CreativeCode.JWK.KeyParts
        - Section 7.1. JSON Web Signature and Encryption Algorithms Registry
        - Section 3.1.  "alg" (Algorithm) Header Parameter Values for JWS      
     */
-    public sealed class Algorithm : IJWKKeyPart
+    public sealed class Algorithm : IJWKConverter
     {
         // HMAC
         private const string HS256_VALUE = "HS256";

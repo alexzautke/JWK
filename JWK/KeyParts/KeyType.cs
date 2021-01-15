@@ -1,10 +1,11 @@
 ﻿using System;
+using CreativeCode.JWK.TypeConverters;
 using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
     // See RFC 7518 - JSON Web Algorithms (JWA) - Section 6.1. "kty" (Key Type) Parameter Values
-    public sealed class KeyType : IJWKKeyPart
+    public sealed class KeyType : IJWKConverter
     {
         private const string EC_VALUE = "EC";
         private const string RSA_VALUE = "RSA";

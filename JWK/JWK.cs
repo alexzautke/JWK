@@ -41,7 +41,11 @@ namespace CreativeCode.JWK
         public JWK(string jwk)
         {
             var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk);
+
             KeyType = deserializeJWK.KeyType;
+            if (KeyType is null)
+                throw new ArgumentNullException("KeyType MUST be provided");
+
             PublicKeyUse = deserializeJWK.PublicKeyUse;
             KeyOperations = deserializeJWK.KeyOperations;
             Algorithm = deserializeJWK.Algorithm;

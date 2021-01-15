@@ -9,7 +9,7 @@ using static CreativeCode.JWK.KeyParts.KeyOperation;
 
 namespace CreativeCode.JWK.TypeConverters
 {
-    internal class KeyOperationConverter : IJWKKeyPart
+    internal class KeyOperationConverter : IJWKConverter
     {
         public object Deserialize(JToken jwkRepresentation)
         {
