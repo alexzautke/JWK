@@ -63,7 +63,7 @@ namespace CreativeCode.JWK
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null, Algorithm algorithm = null, string keyId = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
-            KeyOperations = keyOperations;
+            KeyOperations = new HashSet<KeyOperation>(keyOperations);
             Algorithm = algorithm;
             KeyID = keyId;
         }
@@ -82,7 +82,7 @@ namespace CreativeCode.JWK
         public JWK(PublicKeyUse publicKeyUse, IEnumerable<KeyOperation> keyOperations, Algorithm algorithm, Dictionary<KeyParameter, string> keyParameters)
         {
             PublicKeyUse = publicKeyUse;
-            KeyOperations = keyOperations;
+            KeyOperations = new HashSet<KeyOperation>(keyOperations);
             Algorithm = algorithm;
             KeyID = Guid.NewGuid().ToString();
             KeyType = DeriveKeyType(algorithm);
