@@ -27,7 +27,7 @@ namespace CreativeCode.JWK.KeyParts
         public object Deserialize(JToken jwkRepresentation)
         {
             if (jwkRepresentation is null)
-                throw new ArgumentNullException("Cannot deserialize null value");
+                throw new ArgumentNullException("Key Type is a mandatory element and MUST be present");
 
             return jwkRepresentation.ToString() switch
             {

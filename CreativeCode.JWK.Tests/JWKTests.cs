@@ -324,6 +324,21 @@ namespace CreativeCode.JWK.Tests
         }
 
         [Fact]
+        public void JWKCanBeDeserializedMinimalElements()
+        {
+            var jwk = new JWK("{\"kty\":\"RSA\",\"n\":\"4W_ciNjvogFBPf9BYd9jySsrsN6gdosZMAWDi79bZIpYXPHSynbNQUcDe2tSwGKgG9d1ak-jLtZ37SOcC0s1C6W5jAGBHuA-2Oscpa1DZPXrShrDW0wbO2wbBW17pY9rLlnFel-26eE48U0utDdDFCxBBOsWj382sDJzfqLj6DTKBn9r1wDvbRLbWecvZF5uTG392KoO5sNvwwnAhRzo1HX7hPTr5zDOBkfKQolIo99g5Gq9k-_yqDWmRC0mxO6SOfFdrxSMTgCUTyZA_jQXvn7OrSO28yvKdpnrHihGExHubA-m30a21LBQlomovYZiXJ7mlvUnzFxxa7XOsbA1sFU\",\"e\":\"AQAB\",\"d\":\"BAOo6qrqQXlCPydfc621qixhn8mnE9VQQoGmoQNsTjMEdcs8lKxe5U2tazIzDAf1j-lbRuRaJIhfJFLhAXZ6YFW4Ix0XvoQBun0dSnn2XELgyLYHSoXlaj53kLYtYHpYTz_7-zzfFfUTvYBBV6YwRJixI7RH95AtWh_b3KJr6oOdmGzul7XcHJ0rcPAKfRXhUrDpjS-iZ3TOAEImQHBwHCjsiQPSDlz3jlUlG-LnE9l3PH49rKFjwc6RIfhKt0jBuwnxE3cX87ux-cFBdo_lIyv2yH-watb9SO1WqxQA2rXBXrWWKitLMhaQLFdHIZEf1lHN7VA_UD9ty9p8CZC21NU\",\"p\":\"D0X1M5HmLBNMSvxA_uF-KQ2YnhDmt4ldHiKLjjpJnvJLwXf-TDbApIfHnkRnHxd9adLO4IaAlqL3_oVlS1ZuEijy6auzfwbrcgfsuEYR_k7fG4T8K9TDS2FWe24xFkJgVdRpuMiAt0wZZEexCv2oIFDM0idXrUl7Ikq6RL3kOwob\",\"q\":\"DsKeLZl2Du2RBszDDWKMYhORGR93-CPhSGZT91-Dic6iSWtumfIGAbkjEFiCeMs4tJwktgiYS76IsQ9qCZdrcBj2h-LgMUqrdqKmSq2-krsQPpJxfPadHewa8T2_e48wXzxmx8Dmmoqd4q1LPbOHFMJpY2HBwXopeIbtFa1vUdZP\",\"dp\":\"DDNG5nXyVlzoAbI1PSTlQWfx9LntgskAkDTqI6fd7VEBQL9YbIsEIamwxHVBpq196g2SYfovN6Vg0ni-bIrTDECXoh8dGChv5Tv9VUnrz6gzQmldgqnHgyxzB9AC-BP3njg6Z3gKkeEBG4DFJNFw_rdslacFu4_KA5-L4aOKb7rn\",\"dq\":\"Dmzw0Rohwvc1_VJT85n0H8qFzerugkr2255-w87KrP2RqHXh830Rl8-MUGZgpZPgSMwuKOZ_ic-eooWxGcyuSTFsiGQYvrP-ngTaxzPFhHxkpPLVDc-swNjHgCzcHvNT0FAlF2cVOcbuBeNeHOB_za8v9txM1D4Dl_MudTg7Ct2L\",\"qi\":\"Aw3In2d6QWQ95rRJwAVAXuWJKubLqSxXTPVu7ueyn1PGMyzK7-6nFNfa1WBpCE4LQ-Ep3eZ2GhSZzN888iixnkNNuaXToUzk0dBEyNM7WDg8tGuyvd5yaJd6wj8q6prYUJGxk7V0mDMhSsA6uttRYe9rbemye6eUNwQIvfmjkbQl\"}");
+            jwk.KeyType.Should().Be(KeyType.RSA);
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterN).Should().Be("4W_ciNjvogFBPf9BYd9jySsrsN6gdosZMAWDi79bZIpYXPHSynbNQUcDe2tSwGKgG9d1ak-jLtZ37SOcC0s1C6W5jAGBHuA-2Oscpa1DZPXrShrDW0wbO2wbBW17pY9rLlnFel-26eE48U0utDdDFCxBBOsWj382sDJzfqLj6DTKBn9r1wDvbRLbWecvZF5uTG392KoO5sNvwwnAhRzo1HX7hPTr5zDOBkfKQolIo99g5Gq9k-_yqDWmRC0mxO6SOfFdrxSMTgCUTyZA_jQXvn7OrSO28yvKdpnrHihGExHubA-m30a21LBQlomovYZiXJ7mlvUnzFxxa7XOsbA1sFU");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterE).Should().Be("AQAB");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterD).Should().Be("BAOo6qrqQXlCPydfc621qixhn8mnE9VQQoGmoQNsTjMEdcs8lKxe5U2tazIzDAf1j-lbRuRaJIhfJFLhAXZ6YFW4Ix0XvoQBun0dSnn2XELgyLYHSoXlaj53kLYtYHpYTz_7-zzfFfUTvYBBV6YwRJixI7RH95AtWh_b3KJr6oOdmGzul7XcHJ0rcPAKfRXhUrDpjS-iZ3TOAEImQHBwHCjsiQPSDlz3jlUlG-LnE9l3PH49rKFjwc6RIfhKt0jBuwnxE3cX87ux-cFBdo_lIyv2yH-watb9SO1WqxQA2rXBXrWWKitLMhaQLFdHIZEf1lHN7VA_UD9ty9p8CZC21NU");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterP).Should().Be("D0X1M5HmLBNMSvxA_uF-KQ2YnhDmt4ldHiKLjjpJnvJLwXf-TDbApIfHnkRnHxd9adLO4IaAlqL3_oVlS1ZuEijy6auzfwbrcgfsuEYR_k7fG4T8K9TDS2FWe24xFkJgVdRpuMiAt0wZZEexCv2oIFDM0idXrUl7Ikq6RL3kOwob");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterQ).Should().Be("DsKeLZl2Du2RBszDDWKMYhORGR93-CPhSGZT91-Dic6iSWtumfIGAbkjEFiCeMs4tJwktgiYS76IsQ9qCZdrcBj2h-LgMUqrdqKmSq2-krsQPpJxfPadHewa8T2_e48wXzxmx8Dmmoqd4q1LPbOHFMJpY2HBwXopeIbtFa1vUdZP");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterDP).Should().Be("DDNG5nXyVlzoAbI1PSTlQWfx9LntgskAkDTqI6fd7VEBQL9YbIsEIamwxHVBpq196g2SYfovN6Vg0ni-bIrTDECXoh8dGChv5Tv9VUnrz6gzQmldgqnHgyxzB9AC-BP3njg6Z3gKkeEBG4DFJNFw_rdslacFu4_KA5-L4aOKb7rn");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterDQ).Should().Be("Dmzw0Rohwvc1_VJT85n0H8qFzerugkr2255-w87KrP2RqHXh830Rl8-MUGZgpZPgSMwuKOZ_ic-eooWxGcyuSTFsiGQYvrP-ngTaxzPFhHxkpPLVDc-swNjHgCzcHvNT0FAlF2cVOcbuBeNeHOB_za8v9txM1D4Dl_MudTg7Ct2L");
+            jwk.KeyParameters.GetValueOrDefault(RSAKeyParameterQI).Should().Be("Aw3In2d6QWQ95rRJwAVAXuWJKubLqSxXTPVu7ueyn1PGMyzK7-6nFNfa1WBpCE4LQ-Ep3eZ2GhSZzN888iixnkNNuaXToUzk0dBEyNM7WDg8tGuyvd5yaJd6wj8q6prYUJGxk7V0mDMhSsA6uttRYe9rbemye6eUNwQIvfmjkbQl");
+        }
+
+        [Fact]
         public void JWKWithMinimalRequiredElementsCanBeCreated()
         {
             KeyType keyType = KeyType.EllipticCurve;

@@ -13,6 +13,9 @@ namespace CreativeCode.JWK.TypeConverters
     {
         public object Deserialize(JToken jwkRepresentation)
         {
+            if (jwkRepresentation is null)
+                return null;
+
             var keyOperations = new HashSet<KeyOperation>();
             foreach (var operation in jwkRepresentation.Children())
             {

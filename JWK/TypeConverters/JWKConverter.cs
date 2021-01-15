@@ -61,7 +61,7 @@ namespace CreativeCode.JWK.TypeConverters
                     }
                     else
                     {
-                        property.SetValue(jwk, token.ToString());
+                        property.SetValue(jwk, token?.ToString());
                     }
                 }
             }
