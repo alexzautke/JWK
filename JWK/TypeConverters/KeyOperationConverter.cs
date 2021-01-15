@@ -19,18 +19,7 @@ namespace CreativeCode.JWK.TypeConverters
             var keyOperations = new HashSet<KeyOperation>();
             foreach (var operation in jwkRepresentation.Children())
             {
-                var match = operation.ToString() switch
-                {
-                    SIGN_VALUE => ComputeDigitalSignature,
-                    VERIFY_VALUE => VerifyDigitalSignature,
-                    ENCRYPT_VALUE => EncryptContent,
-                    DECRYPT_VALUE => DecryptContentAndValidateDecryption,
-                    WRAP_KEY_VALUE => EncryptKey,
-                    UNWRAP_KEY_VALUE => DeriveKey,
-                    DERIVE_KEY_VALUE => DecryptKeyAndValidateDecryption,
-                    DERIVE_BITS_VALUE => DeriveBits,
-                    _ => null
-                };
+                var match = TryGetKeyOperation(operation?.ToString());
                 keyOperations.Add(match);
             }
 
