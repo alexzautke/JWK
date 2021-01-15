@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
 using Xunit;
+using static CreativeCode.JWK.KeyParts.KeyParameter;
 
 namespace CreativeCode.JWK.Tests
 {
@@ -11,15 +12,16 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void KeyParametersCanBeSerialized()
         {
-            var keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            var keyParameters = new Dictionary<KeyParameter, string>
             {
-                {"crv", ("curveName", false)},
-                {"x", ("publicKeyX", false)},
-                {"y", ("publicKeyY", false)},
-                {"d", ("privateKeyD", true)}
-            });
+                {ECKeyParameterCRV, "curveName"},
+                {ECKeyParameterX, "publicKeyX"},
+                {ECKeyParameterY, "publicKeyY"},
+                {ECKeyParameterD, "privateKeyD"}
+            };
 
-            var json = keyParameters.Serialize();
+            var jwk = new JWK(KeyType.EllipticCurve, keyParameters);
+            var json = jwk.Export(false);
             json.Should().NotContain("privateKeyD", "privateKeyD is private and should not be exported by default");
 
             json.Should().Contain("\"y\":\"publicKeyY\"", "publicKeyY should be included by default");
@@ -31,15 +33,16 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void KeyParametersCanBeSerializedExportPrivate()
         {
-            var keyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            var keyParameters = new Dictionary<KeyParameter, string>
             {
-                {"crv", ("curveName", false)},
-                {"x", ("publicKeyX", false)},
-                {"y", ("publicKeyY", false)},
-                {"d", ("privateKeyD", true)}
-            });
+                {ECKeyParameterCRV, "curveName"},
+                {ECKeyParameterX, "publicKeyX"},
+                {ECKeyParameterY, "publicKeyY"},
+                {ECKeyParameterD, "privateKeyD"}
+            };
 
-            var json = keyParameters.Serialize(true);
+            var jwk = new JWK(KeyType.EllipticCurve, keyParameters);
+            var json = jwk.Export(true);
             json.Should().Contain("\"d\":\"privateKeyD\"", "privateKeyD is private and should be exported if requested");
             json.Should().Contain("\"y\":\"publicKeyY\"", "publicKeyY should be included by default");
             json.Should().Contain("\"x\":\"publicKeyX\"", "publicKeyX should be included by default");

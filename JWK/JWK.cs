@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using CreativeCode.JWK.KeyParts;
 using CreativeCode.JWK.TypeConverters;
 using System.Linq;
+using static CreativeCode.JWK.KeyParts.KeyParameter;
 
 namespace CreativeCode.JWK
 {
@@ -20,8 +21,8 @@ namespace CreativeCode.JWK
         public PublicKeyUse PublicKeyUse { get; private set; }   // OPTIONAL
 
         [JsonProperty(PropertyName = "key_ops")]
-        [JsonConverter(typeof(KeyOperationsConverter))]
-        public KeyOperations KeyOperations { get; private set; } // OPTIONAL
+        [JWKConverterAttribute(typeof(KeyOperationConverter))]
+        public HashSet<KeyOperation> KeyOperations { get; private set; } // OPTIONAL
 
         [JsonProperty(PropertyName = "alg")]
         public Algorithm Algorithm { get; private set; }         // OPTIONAL
@@ -30,7 +31,8 @@ namespace CreativeCode.JWK
         public string KeyID { get; private set; }                // OPTIONAL
 
         [JsonProperty]
-        public KeyParameters KeyParameters { get; private set; } // OPTIONAL
+        [JWKConverterAttribute(typeof(KeyParameterConverter))]
+        public Dictionary<KeyParameter, string> KeyParameters { get; private set; } // OPTIONAL
 
         internal bool _shouldExportPrivateKey;
 
@@ -41,7 +43,7 @@ namespace CreativeCode.JWK
             JsonConvert.DeserializeObject<JWK>(jwk);
         }
 
-        public JWK(KeyType keyType, KeyParameters keyParameters)
+        public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters)
         {
             if (keyType is null)
                 throw new ArgumentNullException("KeyType MUST be provided");
@@ -52,14 +54,14 @@ namespace CreativeCode.JWK
             KeyParameters = keyParameters;
         }
 
-        public JWK(KeyType keyType, KeyParameters keyParameters, PublicKeyUse publicKeyUse = null, KeyOperations keyOperations = null, Algorithm algorithm = null): this(keyType, keyParameters)
+        public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, HashSet<KeyOperation> keyOperations = null, Algorithm algorithm = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
             Algorithm = algorithm;
         }
 
-        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse, KeyOperations keyOperations)
+        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse, HashSet<KeyOperation> keyOperations)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
@@ -70,7 +72,7 @@ namespace CreativeCode.JWK
             InitializeKey();
         }
 
-        public JWK(PublicKeyUse publicKeyUse, KeyOperations keyOperations, Algorithm algorithm, KeyParameters keyParameters)
+        public JWK(PublicKeyUse publicKeyUse, HashSet<KeyOperation> keyOperations, Algorithm algorithm, Dictionary<KeyParameter, string> keyParameters)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
@@ -176,13 +178,13 @@ namespace CreativeCode.JWK
             var publicKeyX = Base64urlEncode(eCParameters.Q.X);
             var publicKeyY = Base64urlEncode(eCParameters.Q.Y);
 
-            KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            KeyParameters = new Dictionary<KeyParameter, string>
             {
-                {"crv", (curveName, false)},
-                {"x", (publicKeyX, false)},
-                {"y", (publicKeyY, false)},
-                {"d", (privateKeyD, true)}
-            });
+                {ECKeyParameterCRV, curveName},
+                {ECKeyParameterX, publicKeyX},
+                {ECKeyParameterY, publicKeyY},
+                {ECKeyParameterD, privateKeyD}
+            };
         }
 
         private void RSAParameters()
@@ -202,17 +204,17 @@ namespace CreativeCode.JWK
                 var secondFactorCRTExponent = Base64urlEncode(rsaKeyParameters.DQ);
                 var firstCRTCoefficient = Base64urlEncode(rsaKeyParameters.InverseQ);
 
-                KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+                KeyParameters = new Dictionary<KeyParameter, string>
                 {
-                    {"n", (modulus, false)},
-                    {"e", (exponent, false)},
-                    {"d", (privateExponent, true)},
-                    {"p", (firstPrimeFactor, true)},
-                    {"q", (secondPrimeFactor, true)},
-                    {"dp", (firstFactorCRTExponent, true)},
-                    {"dq", (secondFactorCRTExponent, true)},
-                    {"qi", (firstCRTCoefficient, true)}
-                });
+                    {RSAKeyParameterN, modulus},
+                    {RSAKeyParameterE, exponent},
+                    {RSAKeyParameterD, privateExponent},
+                    {RSAKeyParameterP, firstPrimeFactor},
+                    {RSAKeyParameterQ, secondPrimeFactor},
+                    {RSAKeyParameterDP, firstFactorCRTExponent},
+                    {RSAKeyParameterDQ, secondFactorCRTExponent},
+                    {RSAKeyParameterQI, firstCRTCoefficient}
+                };
             }
         }
 
@@ -238,10 +240,10 @@ namespace CreativeCode.JWK
             }
 
             var key = Base64urlEncode(hmac.Key);
-            KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            KeyParameters = new Dictionary<KeyParameter, string>
             {
-                {"k", (key, true)}
-            });
+                {OctKeyParameterK, key}
+            };
         }
 
         private byte[] CreateHMACKey(int keySize){
@@ -266,10 +268,10 @@ namespace CreativeCode.JWK
             aesKey.GenerateKey();
 
             var key = Base64urlEncode(aesKey.Key);
-            KeyParameters = new KeyParameters(new Dictionary<string, (string parameterValue, bool isPrivate)>
+            KeyParameters = new Dictionary<KeyParameter, string>
             {
-                {"k", (key, true)}
-            });
+                {OctKeyParameterK, key}
+            };
         }
 
         private void NONEParameters()
@@ -283,7 +285,7 @@ namespace CreativeCode.JWK
 
         public bool IsSymmetric()
         {
-            return Algorithm.IsSymetric;
+            return Algorithm?.IsSymetric ?? KeyType == KeyType.OCT;
         }
 
         #endregion Crypto helper methods

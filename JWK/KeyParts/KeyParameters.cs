@@ -1,49 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.KeyParts
 {
-    public sealed class KeyParameters : IJWKKeyPart
+    public sealed class KeyParameter
     {
-        public Dictionary<string, (string parameterValue, bool isPrivate)> Values { get; } // Dictionary<key, Tuple<value, isPrivate>>
+        public static readonly KeyParameter RSAKeyParameterN = new KeyParameter("n", false);
+        public static readonly KeyParameter RSAKeyParameterE = new KeyParameter("e", false);
+        public static readonly KeyParameter RSAKeyParameterD = new KeyParameter("d", true);
+        public static readonly KeyParameter RSAKeyParameterP = new KeyParameter("p", true);
+        public static readonly KeyParameter RSAKeyParameterQ = new KeyParameter("q", true);
+        public static readonly KeyParameter RSAKeyParameterDP = new KeyParameter("dp", true);
+        public static readonly KeyParameter RSAKeyParameterDQ = new KeyParameter("dq", true);
+        public static readonly KeyParameter RSAKeyParameterQI = new KeyParameter("qi", true);
 
-        private KeyParameters() { } // Used only for deserialization
+        public static readonly KeyParameter ECKeyParameterCRV = new KeyParameter("crv", false);
+        public static readonly KeyParameter ECKeyParameterX = new KeyParameter("x", false);
+        public static readonly KeyParameter ECKeyParameterY = new KeyParameter("y", false);
+        public static readonly KeyParameter ECKeyParameterD = new KeyParameter("d", true);
 
-        public KeyParameters(Dictionary<string, (string parameterValue, bool isPrivate)> keyParameters){
-            if (keyParameters == null)
-                throw new ArgumentNullException("Key Parameters cannot be null");
+        public static readonly KeyParameter OctKeyParameterK = new KeyParameter("k", true);
 
-            Values = keyParameters;
-        }
+        public string Name { get; }
+        public bool IsPrivate { get; }
 
-        public string Serialize(bool shouldExportPrivateKey = false)
+        private KeyParameter(string name, bool isPrivate)
         {
-            return Values.Aggregate(new StringBuilder(), (result,
-                                                         currentParameter) => AppendKeyParameter(result, currentParameter, shouldExportPrivateKey), 
-                                                         TrimTraillingComma);
-        }
+            if (name == null)
+                throw new ArgumentNullException("Name cannot be null");
 
-        private StringBuilder AppendKeyParameter(StringBuilder current, KeyValuePair<string, (string parameterValue, bool isPrivate)> currentParameter, bool shouldExportPrivateKey)
-        {
-            // Don't seralize empty JSON properties (i.e., private key parameters if "public key only" mode is requested)
-            // Don't seralize if value is marked as private and shouldExportPrivateKey is set to false
-            if (currentParameter.Value.parameterValue != string.Empty && (!(currentParameter.Value.isPrivate && !shouldExportPrivateKey)))
-                current.AppendFormat("\"{0}\":\"{1}\",", currentParameter.Key, currentParameter.Value.parameterValue);
-
-            return current;
-        }
-
-        private string TrimTraillingComma(StringBuilder sb)
-        {
-            return sb.ToString().Trim(',');
-        }
-
-        public object Deserialize(JToken jwkRepresentation)
-        {
-            throw new NotImplementedException();
+            Name = name;
+            IsPrivate = isPrivate;
         }
     }
 }

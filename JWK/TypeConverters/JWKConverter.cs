@@ -6,9 +6,8 @@ using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWK.TypeConverters
 {
-	public class JWKConverter : JsonConverter
+	internal class JWKConverter : JsonConverter
     {
-
         private JsonWriter _writer;
 
         public override bool CanConvert(Type objectType)
@@ -80,25 +79,24 @@ namespace CreativeCode.JWK.TypeConverters
                     if (customAttribute.AttributeType != typeof(JsonPropertyAttribute))
                         break; // Only serialize fields which are marked with "JsonProperty"
 
-                    if (customAttribute.NamedArguments.Any(n => n.MemberName == "PropertyName")) // JWK class indicated a custom name
+                    var customJSONPropertyName = customAttribute.NamedArguments.ElementAtOrDefault(0).TypedValue.ToString();
+                    WriteTrailingComma(head, property);
+
+                    var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(CreativeCode.JWK.JWKConverterAttribute));
+                    if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
                     {
-                        var customJSONPropertyName = customAttribute.NamedArguments[0].TypedValue.ToString();
-                        WriteTrailingComma(head, property);
-
-                        if(property.CustomAttributes.Any(a => a.AttributeType == typeof(JsonConverterAttribute))) // Let the type handle the serialization itself as there is a custom serialization needed
-                            _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey));
-
-                        else if(propertyValue is IJWKKeyPart)
-                            _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
-
-                        else
-                            _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
+                        var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
+                        if(customConverterType is { })
+                        {
+                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKKeyPart;
+                            _writer.WriteRaw(instance.Serialize(shouldExportPrivateKey, propertyValue));
+                        }
                     }
-                    else // Attribute is split over multiple elements, therefore let the class handle it itself (e.g. KeyParameters)
-                    { 
-                        WriteTrailingComma(head, property);
-                        _writer.WriteRaw(((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey));
-                    }
+                    else if (propertyValue is IJWKKeyPart)
+                        _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
+
+                    else
+                        _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                 }
             }
 

@@ -34,7 +34,7 @@ namespace CreativeCode.JWK.KeyParts
             };
         }
 
-        public string Serialize(bool shouldExportPrivateKey = false)
+        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
         {
             return KeyUse;
         }

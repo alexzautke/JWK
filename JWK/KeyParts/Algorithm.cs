@@ -57,7 +57,7 @@ namespace CreativeCode.JWK.KeyParts
             IsSymetric = isSymetric;
         }
 
-        public string Serialize(bool shouldExportPrivateKey = false)
+        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
         {
             return Name;
         }

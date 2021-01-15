@@ -5,7 +5,20 @@ namespace CreativeCode.JWK
 {
     public interface IJWKKeyPart
     {
-        string Serialize(bool shouldExportPrivateKey = false);
+        string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null);
         object Deserialize(JToken jwkRepresentation);
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class JWKConverterAttribute : Attribute
+    {
+        public Type @Type { get; }
+
+        public JWKConverterAttribute() { }
+
+        public JWKConverterAttribute(Type @Type)
+        {
+            this.Type = Type;
+        }
     }
 }
