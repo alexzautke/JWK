@@ -22,17 +22,22 @@ namespace CreativeCode.JWK.KeyParts
             this.KeyUse = keyUse;
         }
 
-        public object Deserialize(JToken jwkRepresentation)
+        public static PublicKeyUse TryGetPublicKeyUse(string publicKeyUse)
         {
-            if (jwkRepresentation is null)
-                return null;
-
-            return jwkRepresentation.ToString() switch
+            return publicKeyUse?.ToString() switch
             {
                 SIG_VALUE => Signature,
                 ENC_VALUE => Encryption,
                 _ => null
             };
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            if (jwkRepresentation is null)
+                return null;
+
+            return TryGetPublicKeyUse(jwkRepresentation?.ToString());
         }
 
         public object Deserialize(JObject jwkRepresentation)

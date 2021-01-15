@@ -24,18 +24,23 @@ namespace CreativeCode.JWK.KeyParts
             this.Type = type;
         }
 
-        public object Deserialize(JToken jwkRepresentation)
+        public static KeyType TryGetKeyType(string keyType)
         {
-            if (jwkRepresentation is null)
-                throw new ArgumentNullException("Key Type is a mandatory element and MUST be present");
-
-            return jwkRepresentation.ToString() switch
+            return keyType?.ToString() switch
             {
                 EC_VALUE => EllipticCurve,
                 RSA_VALUE => RSA,
                 OCT_VALUE => OCT,
                 _ => null
             };
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            if (jwkRepresentation is null)
+                throw new ArgumentNullException("Key Type is a mandatory element and MUST be present");
+
+            return TryGetKeyType(jwkRepresentation?.ToString());
         }
 
         public object Deserialize(JObject jwkRepresentation)
