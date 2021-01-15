@@ -22,7 +22,7 @@ namespace CreativeCode.JWK
 
         [JsonProperty(PropertyName = "key_ops")]
         [JWKConverterAttribute(typeof(KeyOperationConverter))]
-        public HashSet<KeyOperation> KeyOperations { get; private set; } // OPTIONAL
+        public IEnumerable<KeyOperation> KeyOperations { get; private set; } // OPTIONAL
 
         [JsonProperty(PropertyName = "alg")]
         public Algorithm Algorithm { get; private set; }         // OPTIONAL
@@ -60,7 +60,7 @@ namespace CreativeCode.JWK
             KeyParameters = keyParameters;
         }
 
-        public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, HashSet<KeyOperation> keyOperations = null, Algorithm algorithm = null, string keyId = null): this(keyType, keyParameters)
+        public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null, Algorithm algorithm = null, string keyId = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
@@ -68,7 +68,7 @@ namespace CreativeCode.JWK
             KeyID = keyId;
         }
 
-        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse, HashSet<KeyOperation> keyOperations)
+        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse, IEnumerable<KeyOperation> keyOperations)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
@@ -79,7 +79,7 @@ namespace CreativeCode.JWK
             InitializeKey();
         }
 
-        public JWK(PublicKeyUse publicKeyUse, HashSet<KeyOperation> keyOperations, Algorithm algorithm, Dictionary<KeyParameter, string> keyParameters)
+        public JWK(PublicKeyUse publicKeyUse, IEnumerable<KeyOperation> keyOperations, Algorithm algorithm, Dictionary<KeyParameter, string> keyParameters)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
