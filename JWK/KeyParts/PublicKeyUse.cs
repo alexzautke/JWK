@@ -25,7 +25,7 @@ namespace CreativeCode.JWK.KeyParts
         public object Deserialize(JToken jwkRepresentation)
         {
             if (jwkRepresentation is null)
-                throw new NotSupportedException("Cannot deserialize null value");
+                throw new ArgumentNullException("Cannot deserialize null value");
 
             return jwkRepresentation.ToString() switch
             {
