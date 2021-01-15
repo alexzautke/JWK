@@ -40,14 +40,21 @@ namespace CreativeCode.JWK
 
         public JWK(string jwk)
         {
-            var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk);
+            try
+            {
+                var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk);
 
-            KeyType = deserializeJWK.KeyType;
-            PublicKeyUse = deserializeJWK.PublicKeyUse;
-            KeyOperations = deserializeJWK.KeyOperations;
-            Algorithm = deserializeJWK.Algorithm;
-            KeyID = deserializeJWK.KeyID;
-            KeyParameters = deserializeJWK.KeyParameters;
+                KeyType = deserializeJWK.KeyType;
+                PublicKeyUse = deserializeJWK.PublicKeyUse;
+                KeyOperations = deserializeJWK.KeyOperations;
+                Algorithm = deserializeJWK.Algorithm;
+                KeyID = deserializeJWK.KeyID;
+                KeyParameters = deserializeJWK.KeyParameters;
+            }
+            catch(JsonReaderException e)
+            {
+                throw new InvalidOperationException($"Could not deserialize JWK. Reason: {e.Message}");
+            }
         }
 
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters)
@@ -69,7 +76,7 @@ namespace CreativeCode.JWK
             KeyID = keyId;
         }
 
-        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse, IEnumerable<KeyOperation> keyOperations)
+        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
