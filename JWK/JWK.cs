@@ -153,7 +153,7 @@ namespace CreativeCode.JWK
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine("Debug Information - JWK - New JWK build was successfully. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
+                Console.WriteLine($"Debug Information - CreativeCode.JWK - Succesfully created new JWK of type '{KeyType}'. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
             #endif
         }
 
@@ -173,7 +173,7 @@ namespace CreativeCode.JWK
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine("Debug Information - JWK - Serialized JWK. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
+                Console.WriteLine($"Debug Information - CreativeCode.JWK - Succesfully serialized JWK of type '{KeyType}'. It took {performanceStopWatch.Elapsed.TotalMilliseconds}ms.");
             #endif
 
             return jwkJSON;
