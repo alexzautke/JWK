@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CreativeCode.JWK.KeyParts
 {
@@ -13,12 +14,18 @@ namespace CreativeCode.JWK.KeyParts
         public static readonly KeyParameter RSAKeyParameterDQ = new KeyParameter("dq", true);
         public static readonly KeyParameter RSAKeyParameterQI = new KeyParameter("qi", true);
 
+        public static readonly IEnumerable<KeyParameter> RSAKeyParameters = new[] { RSAKeyParameterN, RSAKeyParameterE, RSAKeyParameterD, RSAKeyParameterP, RSAKeyParameterQ, RSAKeyParameterDP, RSAKeyParameterDQ, RSAKeyParameterQI };
+
         public static readonly KeyParameter ECKeyParameterCRV = new KeyParameter("crv", false);
         public static readonly KeyParameter ECKeyParameterX = new KeyParameter("x", false);
         public static readonly KeyParameter ECKeyParameterY = new KeyParameter("y", false);
         public static readonly KeyParameter ECKeyParameterD = new KeyParameter("d", true);
 
+        public static readonly IEnumerable<KeyParameter> ECKeyParameters = new[] { ECKeyParameterCRV, ECKeyParameterX, ECKeyParameterY, ECKeyParameterD };
+
         public static readonly KeyParameter OctKeyParameterK = new KeyParameter("k", true);
+
+        public static readonly IEnumerable<KeyParameter> OctKeyParameters = new[] { OctKeyParameterK };
 
         public string Name { get; }
         public bool IsPrivate { get; }

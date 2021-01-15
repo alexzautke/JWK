@@ -40,7 +40,13 @@ namespace CreativeCode.JWK
 
         public JWK(string jwk)
         {
-            JsonConvert.DeserializeObject<JWK>(jwk);
+            var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk);
+            KeyType = deserializeJWK.KeyType;
+            PublicKeyUse = deserializeJWK.PublicKeyUse;
+            KeyOperations = deserializeJWK.KeyOperations;
+            Algorithm = deserializeJWK.Algorithm;
+            KeyID = deserializeJWK.KeyID;
+            KeyParameters = deserializeJWK.KeyParameters;
         }
 
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters)

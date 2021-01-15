@@ -7,10 +7,11 @@ namespace CreativeCode.JWK
     {
         string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null);
         object Deserialize(JToken jwkRepresentation);
+        object Deserialize(JObject jwkRepresentation);
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class JWKConverterAttribute : Attribute
+    internal class JWKConverterAttribute : Attribute
     {
         public Type @Type { get; }
 

@@ -37,6 +37,11 @@ namespace CreativeCode.JWK.KeyParts
             };
         }
 
+        public object Deserialize(JObject jwkRepresentation)
+        {
+            throw new NotImplementedException();
+        }
+
         public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
         {
             return Type;

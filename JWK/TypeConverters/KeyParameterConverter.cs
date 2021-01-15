@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CreativeCode.JWK.KeyParts;
@@ -11,6 +12,45 @@ namespace CreativeCode.JWK.TypeConverters
         public object Deserialize(JToken jwkRepresentation)
         {
             throw new System.NotImplementedException();
+        }
+
+        public object Deserialize(JObject jwkRepresentation)
+        {
+            var keyParameters = new Dictionary<KeyParameter, string>();
+            jwkRepresentation.TryGetValue("kty", out var token);
+            if (token is null)
+                throw new InvalidOperationException("Cannot deserialize Key Parameters if Key Type is not present");
+
+            var kty = token.ToString();
+            if (kty.Equals(KeyType.RSA.Type))
+            {
+                foreach(var parameter in KeyParameter.RSAKeyParameters)
+                {
+                    jwkRepresentation.TryGetValue(parameter.Name, out token);
+                    if (token is { })
+                        keyParameters.Add(parameter, token.ToString());
+                }
+            }
+            if (kty.Equals(KeyType.EllipticCurve.Type))
+            {
+                foreach (var parameter in KeyParameter.ECKeyParameters)
+                {
+                    jwkRepresentation.TryGetValue(parameter.Name, out token);
+                    if (token is { })
+                        keyParameters.Add(parameter, token.ToString());
+                }
+            }
+            if (kty.Equals(KeyType.OCT.Type))
+            {
+                foreach (var parameter in KeyParameter.OctKeyParameters)
+                {
+                    jwkRepresentation.TryGetValue(parameter.Name, out token);
+                    if (token is { })
+                        keyParameters.Add(parameter, token.ToString());
+                }
+            }
+
+            return keyParameters;
         }
 
         public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)

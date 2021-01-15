@@ -90,5 +90,10 @@ namespace CreativeCode.JWK.KeyParts
                 _ => null
             };
         }
+
+        public object Deserialize(JObject jwkRepresentation)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

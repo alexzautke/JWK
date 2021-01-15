@@ -5,14 +5,14 @@ namespace CreativeCode.JWK.KeyParts
     // See RFC 7517 - JSON Web Key (JWK) - Section 4.3. "key_ops" (Key Operations) Parameter
     public sealed class KeyOperation
     {
-        private const string SIGN_VALUE = "sign";
-        private const string VERIFY_VALUE = "verify";
-        private const string ENCRYPT_VALUE = "encrypt";
-        private const string DECRYPT_VALUE = "decrypt";
-        private const string WRAP_KEY_VALUE = "wrapKey";
-        private const string UNWRAP_KEY_VALUE = "unwrapKey";
-        private const string DERIVE_KEY_VALUE = "deriveKey";
-        private const string DERIVE_BITS_VALUE = "deriveBits";
+        internal const string SIGN_VALUE = "sign";
+        internal const string VERIFY_VALUE = "verify";
+        internal const string ENCRYPT_VALUE = "encrypt";
+        internal const string DECRYPT_VALUE = "decrypt";
+        internal const string WRAP_KEY_VALUE = "wrapKey";
+        internal const string UNWRAP_KEY_VALUE = "unwrapKey";
+        internal const string DERIVE_KEY_VALUE = "deriveKey";
+        internal const string DERIVE_BITS_VALUE = "deriveBits";
 
         public static readonly KeyOperation ComputeDigitalSignature = new KeyOperation(SIGN_VALUE);
         public static readonly KeyOperation VerifyDigitalSignature = new KeyOperation(VERIFY_VALUE);

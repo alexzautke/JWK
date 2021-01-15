@@ -5,12 +5,36 @@ using System.Text;
 using CreativeCode.JWK.KeyParts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static CreativeCode.JWK.KeyParts.KeyOperation;
 
 namespace CreativeCode.JWK.TypeConverters
 {
-    public class KeyOperationConverter : IJWKKeyPart
+    internal class KeyOperationConverter : IJWKKeyPart
     {
         public object Deserialize(JToken jwkRepresentation)
+        {
+            var keyOperations = new HashSet<KeyOperation>();
+            foreach (var operation in jwkRepresentation.Children())
+            {
+                var match = operation.ToString() switch
+                {
+                    SIGN_VALUE => ComputeDigitalSignature,
+                    VERIFY_VALUE => VerifyDigitalSignature,
+                    ENCRYPT_VALUE => EncryptContent,
+                    DECRYPT_VALUE => DecryptContentAndValidateDecryption,
+                    WRAP_KEY_VALUE => EncryptKey,
+                    UNWRAP_KEY_VALUE => DeriveKey,
+                    DERIVE_KEY_VALUE => DecryptKeyAndValidateDecryption,
+                    DERIVE_BITS_VALUE => DeriveBits,
+                    _ => null
+                };
+                keyOperations.Add(match);
+            }
+
+            return keyOperations;
+        }
+
+        public object Deserialize(JObject jwkRepresentation)
         {
             throw new NotImplementedException();
         }

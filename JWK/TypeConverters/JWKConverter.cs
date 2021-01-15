@@ -34,12 +34,26 @@ namespace CreativeCode.JWK.TypeConverters
                     // Get token by name indicated by JsonPropertyAttribute
                     var propertyNameArgument = customAttributeData.NamedArguments.FirstOrDefault(n => n.MemberName == "PropertyName");
                     var propertyName = propertyNameArgument.TypedValue.Value as string;
-                    if (propertyName is null)
-                        break;
-
                     jo.TryGetValue(propertyName, out var token);
 
-                    if (property.PropertyType.GetInterfaces().Any(i => i == typeof(IJWKKeyPart))) // Custom Deserialization needed
+                    var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
+                    if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
+                    {
+                        var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
+                        if (customConverterType is { } && propertyName is { })
+                        {
+                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKKeyPart;
+                            var instanceValue = instance.Deserialize(token);
+                            property.SetValue(jwk, instanceValue);
+                        }
+                        if (customConverterType is { } && propertyName is null)
+                        {
+                            var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKKeyPart;
+                            var instanceValue = instance.Deserialize(jo);
+                            property.SetValue(jwk, instanceValue);
+                        }
+                    }
+                    else if (property.PropertyType.GetInterfaces().Any(i => i == typeof(IJWKKeyPart)))
                     {
                         var instance = Activator.CreateInstance(property.PropertyType, true) as IJWKKeyPart;
                         var instanceValue = instance.Deserialize(token);
@@ -82,7 +96,7 @@ namespace CreativeCode.JWK.TypeConverters
                     var customJSONPropertyName = customAttribute.NamedArguments.ElementAtOrDefault(0).TypedValue.ToString();
                     WriteTrailingComma(head, property);
 
-                    var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(CreativeCode.JWK.JWKConverterAttribute));
+                    var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
                     if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
                     {
                         var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
@@ -95,7 +109,7 @@ namespace CreativeCode.JWK.TypeConverters
                     else if (propertyValue is IJWKKeyPart)
                         _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKKeyPart)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
 
-                    else
+                    else // Serialize system types directly
                         _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                 }
             }
