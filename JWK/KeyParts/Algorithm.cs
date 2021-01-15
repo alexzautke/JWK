@@ -58,17 +58,9 @@ namespace CreativeCode.JWK.KeyParts
             IsSymetric = isSymetric;
         }
 
-        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
+        public static Algorithm TryGetAlgorithm(string algorithm)
         {
-            return Name;
-        }
-
-        public object Deserialize(JToken jwkRepresentation)
-        {
-            if (jwkRepresentation is null)
-                return null;
-
-            return jwkRepresentation.ToString() switch
+            return algorithm switch
             {
                 HS256_VALUE => HS256,
                 HS384_VALUE => HS384,
@@ -83,13 +75,26 @@ namespace CreativeCode.JWK.KeyParts
                 ES512_VALUE => ES512,
 
                 A128GCMKW_VALUE => A128GCMKW,
-                A192GCMKW_VALUE => A192GCMKW_VALUE,
-                A256GCMKW_VALUE => A256GCMKW_VALUE,
+                A192GCMKW_VALUE => A192GCMKW,
+                A256GCMKW_VALUE => A256GCMKW,
 
                 NONE_VALUE => None,
 
                 _ => null
             };
+        }
+
+        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
+        {
+            return Name;
+        }
+
+        public object Deserialize(JToken jwkRepresentation)
+        {
+            if (jwkRepresentation is null)
+                return null;
+
+            return TryGetAlgorithm(jwkRepresentation.ToString());
         }
 
         public object Deserialize(JObject jwkRepresentation)
