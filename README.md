@@ -43,7 +43,7 @@ The following configuration has been succesfully tested for building and running
 - [] Support for EdDSA keys
 - [] Support for exporting private / public keys in a JWKS (JSON Web Key Set)
 - [] Support for x5u, x5c, x5t, x5t#S256 parameters in a JWK
-- [] Support deserialization of JWKs
+- [] Check for required key parameters on deserialization
 - [] Follow RFC7517 security conciderations guidelines 
 
 ### Documentation 
