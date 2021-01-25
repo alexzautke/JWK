@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.4.0 - 2021-01-25
+
+### Changed
+- The BuildWithOptions method has been removed. Corresponding constructors for the 'JWK' class have been added.
+- 'keyParameters' has been renamed to 'KeyParameters'
+- Added a constructor to initialize a JWK with key parameters
+- KeyType has been removed from Algorithm
+- Added a constructor to deserialize a JWK from a string
+- Added TryGetAlgorithm, TryGetKeyType and TryGetPublicKeyUse to get the string representation of the corresponding object.
+
 ## 0.3.0 - 2020-12-21
 
 ### Changed
