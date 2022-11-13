@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\CreativeCode.JWK.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
@@ -13,11 +15,8 @@
     <PackageTags>JSON;JWK;JOSE;RFC7517;Digital Signature;</PackageTags>
     <Title>CreativeCode.JWK</Title>
     <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
-    <ReleaseVersion>0.4.0</ReleaseVersion>
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWK</PackageId>
-    <SynchReleaseVersion>false</SynchReleaseVersion>
-    <PackageVersion>0.4.0</PackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -26,11 +25,13 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2"><PrivateAssets>all</PrivateAssets>
-<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-</PackageReference>
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -43,4 +44,5 @@
   <ItemGroup>
     <Compile Remove="Startup.cs" />
   </ItemGroup>
+  
 </Project>
