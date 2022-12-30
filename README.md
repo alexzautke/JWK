@@ -28,6 +28,8 @@ Supported Key Types for creating new JWKs (with the corresponding intended algor
 | :negative_squared_cross_mark: | Currently being implemented / Untested |
 | :x:                           | Not implemented yet                    |
 
+Building JSON Web Key Sets is also supported.
+
 ## Build
 
 The following configuration has been succesfully tested for building and running the project:
@@ -41,7 +43,6 @@ The following configuration has been succesfully tested for building and running
 ### Project TODOs
 - [] Complete support for all JWK key types
 - [] Support for EdDSA keys
-- [] Support for exporting private / public keys in a JWKS (JSON Web Key Set)
 - [] Support for x5u, x5c, x5t, x5t#S256 parameters in a JWK
 - [] Check for required key parameters on deserialization
 - [] Follow RFC7517 security conciderations guidelines 
