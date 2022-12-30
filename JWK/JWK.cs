@@ -153,7 +153,7 @@ namespace CreativeCode.JWK
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine($"Debug Information - CreativeCode.JWK - Succesfully initialized new key for JWK of type '{KeyType.Type}'. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
+                Console.WriteLine($"Debug Information - CreativeCode.JWK - Successfully initialized new key for JWK of type '{KeyType.Type}'. It took " + performanceStopWatch.Elapsed.TotalMilliseconds + "ms.");
             #endif
         }
 
@@ -167,13 +167,13 @@ namespace CreativeCode.JWK
             _shouldExportPrivateKey = shouldExportPrivateKey;
 
             if (!shouldExportPrivateKey && IsSymmetric())
-                throw new CryptographicException("Symetric key of type " + KeyType.Serialize() + " cannot be exported with shouldExportPrivateKey set to false.");
+                throw new CryptographicException("Symmetric key of type " + KeyType.Serialize() + " cannot be exported with shouldExportPrivateKey set to false.");
 
             var jwkJSON = JsonConvert.SerializeObject(this);
 
             #if DEBUG
                 performanceStopWatch.Stop();
-                Console.WriteLine($"Debug Information - CreativeCode.JWK - Succesfully serialized JWK of type '{KeyType.Type}'. It took {performanceStopWatch.Elapsed.TotalMilliseconds}ms.");
+                Console.WriteLine($"Debug Information - CreativeCode.JWK - Successfully serialized JWK of type '{KeyType.Type}'. It took {performanceStopWatch.Elapsed.TotalMilliseconds}ms.");
             #endif
 
             return jwkJSON;
@@ -339,7 +339,7 @@ namespace CreativeCode.JWK
             if (!IsSymmetric())
                 return Export(false);
 
-            return "ToString() is not available for symetric keys. Do not expose private key information.";
+            return "ToString() is not available for symmetric keys. Do not expose private key information.";
         }
 
         #endregion Helper methods
