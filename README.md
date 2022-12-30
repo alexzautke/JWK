@@ -54,6 +54,7 @@ The following configuration has been succesfully tested for building and running
 ### NuGet
 
 https://www.nuget.org/packages/CreativeCode.JWK/
+
 ``dotnet add package CreativeCode.JWK``
 
 ### Building from source
