@@ -3,8 +3,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0 - 2022-12-30
+
+### Added
+- Added support for (de-)serialization of JSON Web Key Sets
+- Added Base64Helper.cs for base64url encoding and decoding 
+
 ## 0.5.0 - 2022-11-14
 
+### Changed
 - Upgraded (test-)project dependencies
 
 ## 0.4.0 - 2021-01-25
