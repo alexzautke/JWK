@@ -160,23 +160,11 @@ namespace CreativeCode.JWK
 
         public string Export(bool shouldExportPrivateKey = false)
         {
-            #if DEBUG
-                var performanceStopWatch = new Stopwatch();
-                performanceStopWatch.Start();
-            #endif
-
             _shouldExportPrivateKey = shouldExportPrivateKey;
-
             if (!shouldExportPrivateKey && IsSymmetric())
                 throw new CryptographicException("Symmetric key of type " + KeyType.Serialize() + " cannot be exported with shouldExportPrivateKey set to false.");
 
             var jwkJSON = JsonConvert.SerializeObject(this);
-
-            #if DEBUG
-                performanceStopWatch.Stop();
-                Console.WriteLine($"Debug Information - CreativeCode.JWK - Successfully serialized JWK of type '{KeyType.Type}'. It took {performanceStopWatch.Elapsed.TotalMilliseconds}ms.");
-            #endif
-
             return jwkJSON;
         }
 
