@@ -161,11 +161,10 @@ namespace CreativeCode.JWK
         public string Export(bool shouldExportPrivateKey = false)
         {
             _shouldExportPrivateKey = shouldExportPrivateKey;
-            if (!shouldExportPrivateKey && IsSymmetric())
+            if (!_shouldExportPrivateKey && IsSymmetric())
                 throw new CryptographicException("Symmetric key of type " + KeyType.Serialize() + " cannot be exported with shouldExportPrivateKey set to false.");
-
-            var jwkJSON = JsonConvert.SerializeObject(this);
-            return jwkJSON;
+            
+            return JsonConvert.SerializeObject(this);
         }
 
         #region Create digital keys
