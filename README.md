@@ -65,7 +65,7 @@ https://www.nuget.org/packages/CreativeCode.JWK/
 
 See [JWK Example](https://gist.github.com/alexzautke/ef0466afb1ba6d348310dfff0fc0969b)
 
-## Build
+## Test
 
 Simply run ``dotnet test`` in the root folder of the project. All tests should be passing.
 
