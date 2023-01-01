@@ -23,16 +23,5 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Properties\launchSettings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="KeyParts\" />
-    <Folder Include="TypeConverters\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Startup.cs" />
-  </ItemGroup>
   
 </Project>
