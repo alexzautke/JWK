@@ -42,7 +42,7 @@ The following configuration has been succesfully tested for building and running
 
 ### Project TODOs
 - [] Complete support for all JWK key types
-- [] Support for EdDSA keys
+- [] Support for EdDSA keys (See [RFC8037](https://www.rfc-editor.org/rfc/rfc8037))
 - [] Support for x5u, x5c, x5t, x5t#S256 parameters in a JWK
 - [] Check for required key parameters on deserialization
 - [] Follow RFC7517 security conciderations guidelines
@@ -65,7 +65,7 @@ https://www.nuget.org/packages/CreativeCode.JWK/
 
 See [JWK Example](https://gist.github.com/alexzautke/ef0466afb1ba6d348310dfff0fc0969b)
 
-## Build
+## Test
 
 Simply run ``dotnet test`` in the root folder of the project. All tests should be passing.
 
