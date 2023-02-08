@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.1 - 2023-02-08
+
+### Fixed
+- Fixed an issue that would cause a JsonWriterException when exporting multiple JWK objects in parallel
+
 ## 0.6.0 - 2022-12-30
 
 ### Added

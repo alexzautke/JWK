@@ -8,8 +8,6 @@ namespace CreativeCode.JWK.TypeConverters
 {
 	internal class JWKConverter : JsonConverter
     {
-        private JsonWriter _writer;
-
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(JWK);
@@ -73,9 +71,8 @@ namespace CreativeCode.JWK.TypeConverters
         {
             if (!(value is JWK))
                 throw new ArgumentException("JWK Converter can only objects serialize the type 'JWK'. Found object of type " + value.GetType() + " instead.");
-
-            _writer = writer;
-            _writer.WriteStartObject();
+            
+            writer.WriteStartObject();
 
             var type = value.GetType();
             var properties = type.GetProperties(); // Get all public properties
@@ -94,7 +91,7 @@ namespace CreativeCode.JWK.TypeConverters
                         break; // Only serialize fields which are marked with "JsonProperty"
 
                     var customJSONPropertyName = customAttribute.NamedArguments.ElementAtOrDefault(0).TypedValue.ToString();
-                    WriteTrailingComma(head, property);
+                    WriteTrailingComma(writer, head, property);
 
                     var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
                     if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
@@ -103,25 +100,25 @@ namespace CreativeCode.JWK.TypeConverters
                         if(customConverterType is { })
                         {
                             var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWKConverter;
-                            _writer.WriteRaw(instance.Serialize(shouldExportPrivateKey, propertyValue));
+                            writer.WriteRaw(instance.Serialize(shouldExportPrivateKey, propertyValue));
                         }
                     }
                     else if (propertyValue is IJWKConverter)
-                        _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKConverter)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
+                        writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWKConverter)propertyValue).Serialize(shouldExportPrivateKey) + "\"");
 
                     else // Serialize system types directly
-                        _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
+                        writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                 }
             }
 
-            _writer.WriteEndObject();
+            writer.WriteEndObject();
         }
 
-        private void WriteTrailingComma(PropertyInfo head, PropertyInfo property)
+        private void WriteTrailingComma(JsonWriter writer, PropertyInfo head, PropertyInfo property)
         {
             if (property != head) // Don't start the JSON object with a comma
             {
-                _writer.WriteRaw(",");
+                writer.WriteRaw(",");
             }
         }
 
