@@ -473,5 +473,40 @@ namespace CreativeCode.JWK.Tests
             var tasks = Enumerable.Range(0, 4).Select(_ => Task.Run(export));
             await Task.WhenAll(tasks);
         }
+        
+        [Fact]
+        public void JWKWithRSA256AndIncreasedKeyLengthSignatureCanBeSerialized()
+        {
+            var keyUse = PublicKeyUse.Signature;
+            var keyOperations = new HashSet<KeyOperation>(new[] { KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature });
+            var algorithm = Algorithm.RS256;
+            var keySize = 3000;
+            var jwk = new JWK(algorithm, keyUse, keyOperations, keySize);
+
+            string jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+
+            parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("alg", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("use", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("kid", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("n", out var modulus).Should().BeTrue();
+            parsedJWK.TryGetValue("e", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("d", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("p", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("q", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("dq", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("dp", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("qi", out var _).Should().BeTrue();
+
+            parsedJWK.GetValue("kty").ToString().Should().Be("RSA");
+            parsedJWK.GetValue("alg").ToString().Should().Be(Algorithm.RS256.Name);
+            parsedJWK.GetValue("use").ToString().Should().Be(PublicKeyUse.Signature.KeyUse);
+            parsedJWK.GetValue("key_ops").Values<string>().Count().Should().Be(2);
+            parsedJWK.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(new[] { KeyOperation.ComputeDigitalSignature.Operation, KeyOperation.VerifyDigitalSignature.Operation });
+
+            var urlDecodedModulus = Base64Helper.Base64urlDecode(modulus.ToString());
+            Assert.Equal(keySize / 8, urlDecodedModulus.Length); // The key length is customarily the number of bits in the public modulus
+        }
     }
 }

@@ -15,6 +15,8 @@ namespace CreativeCode.JWK
     [JsonConverter(typeof(JWKConverter))]
     public class JWK
     {
+        private const int MinimumRsaKeySize = 2048;  // See recommendations: https://www.keylength.com/en/compare/
+        
         [JsonProperty(PropertyName = "kty")]
         public KeyType KeyType { get; private set; }             // REQUIRED
 
@@ -70,13 +72,8 @@ namespace CreativeCode.JWK
         /// <param name="keyParameters"></param>
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters)
         {
-            if (keyType is null)
-                throw new ArgumentNullException("KeyType MUST be provided");
-            if (keyParameters is null)
-                throw new ArgumentNullException("KeyParameters MUST be provided");
-
-            KeyType = keyType;
-            KeyParameters = keyParameters;
+            KeyType = keyType ?? throw new ArgumentNullException("KeyType MUST be provided");
+            KeyParameters = keyParameters ?? throw new ArgumentNullException("KeyParameters MUST be provided");
         }
 
         /// <summary>
@@ -102,7 +99,7 @@ namespace CreativeCode.JWK
         /// <param name="algorithm"></param>
         /// <param name="publicKeyUse"></param>
         /// <param name="keyOperations"></param>
-        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null)
+        public JWK(Algorithm algorithm, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null, int? rsaKeySize = null)
         {
             PublicKeyUse = publicKeyUse;
             KeyOperations = keyOperations;
@@ -110,7 +107,15 @@ namespace CreativeCode.JWK
             KeyID = Guid.NewGuid().ToString();
             KeyType = DeriveKeyType(algorithm);
 
-            InitializeKey();
+            if (KeyType != KeyType.RSA && rsaKeySize is { })
+                throw new ArgumentException("rsaKeySize can only be provided if KeyType is RSA");
+            if (KeyType == KeyType.RSA)
+            {
+                rsaKeySize ??= MinimumRsaKeySize;
+                rsaKeySize = Math.Max(rsaKeySize.Value, MinimumRsaKeySize);
+            }
+
+            InitializeKey(rsaKeySize);
         }
 
         private KeyType DeriveKeyType(Algorithm algorithm)
@@ -125,7 +130,7 @@ namespace CreativeCode.JWK
             return null;
         }
 
-        private void InitializeKey()
+        private void InitializeKey(int? rsaKeySize = null)
         {
             #if DEBUG
                 var performanceStopWatch = new Stopwatch();
@@ -139,7 +144,8 @@ namespace CreativeCode.JWK
                     HMACParameters();
                     break;
                 case 'R':
-                    RSAParameters();
+                    if(rsaKeySize is null) throw new InvalidOperationException("rsaKeySize must be provided if a key with KeyType RSA is initialize");
+                    RSAParameters(rsaKeySize.Value);
                     break;
                 case 'A':
                     AESParameters();
@@ -205,11 +211,10 @@ namespace CreativeCode.JWK
             };
         }
 
-        private void RSAParameters()
+        private void RSAParameters(int rsaKeySize)
         {
-            const int rsaKeySize = 2056; // See recommendations: https://www.keylength.com/en/compare/
             using (var rsaKey = new RSACryptoServiceProvider(rsaKeySize)){
-
+                
                 var rsaKeyParameters = rsaKey.ExportParameters(true);
 
                 // RSAParameters properties are big-endian, no need to reverse the byte array (See RFC7518 - 6.3.1. Parameters for RSA Public Keys)
