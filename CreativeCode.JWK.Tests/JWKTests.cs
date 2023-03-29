@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
@@ -507,6 +508,17 @@ namespace CreativeCode.JWK.Tests
 
             var urlDecodedModulus = Base64Helper.Base64urlDecode(modulus.ToString());
             Assert.Equal(keySize / 8, urlDecodedModulus.Length); // The key length is customarily the number of bits in the public modulus
+        }
+        
+        [Fact]
+        public void JWKWithRSA256AndTooLargeKeyLengthThrowsException()
+        {
+            var keyUse = PublicKeyUse.Signature;
+            var keyOperations = new HashSet<KeyOperation>(new[] { KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature });
+            var algorithm = Algorithm.RS256;
+            var keySize = 20000;
+
+            Assert.Throws<CryptographicException>(() => new JWK(algorithm, keyUse, keyOperations, keySize));
         }
     }
 }

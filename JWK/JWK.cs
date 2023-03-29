@@ -16,6 +16,7 @@ namespace CreativeCode.JWK
     public class JWK
     {
         private const int MinimumRsaKeySize = 2048;  // See recommendations: https://www.keylength.com/en/compare/
+        private const int MaximumRsaKeySize = 16384; // See https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.rsacryptoserviceprovider.keysize?source=recommendations&view=net-7.0
         
         [JsonProperty(PropertyName = "kty")]
         public KeyType KeyType { get; private set; }             // REQUIRED
@@ -109,12 +110,7 @@ namespace CreativeCode.JWK
 
             if (KeyType != KeyType.RSA && rsaKeySize is { })
                 throw new ArgumentException("rsaKeySize can only be provided if KeyType is RSA");
-            if (KeyType == KeyType.RSA)
-            {
-                rsaKeySize ??= MinimumRsaKeySize;
-                rsaKeySize = Math.Max(rsaKeySize.Value, MinimumRsaKeySize);
-            }
-
+            
             InitializeKey(rsaKeySize);
         }
 
@@ -144,7 +140,15 @@ namespace CreativeCode.JWK
                     HMACParameters();
                     break;
                 case 'R':
-                    if(rsaKeySize is null) throw new InvalidOperationException("rsaKeySize must be provided if a key with KeyType RSA is initialize");
+                    rsaKeySize ??= MinimumRsaKeySize;
+                    rsaKeySize = Math.Max(rsaKeySize.Value, MinimumRsaKeySize);
+                    
+                    if(rsaKeySize is null) 
+                        throw new InvalidOperationException("rsaKeySize must be provided if a key with KeyType RSA is initialized");
+                    
+                    if (rsaKeySize > MaximumRsaKeySize) 
+                        throw new CryptographicException($"rsaKeySize is too large. Maximum key size is '{MaximumRsaKeySize}' bits");
+                    
                     RSAParameters(rsaKeySize.Value);
                     break;
                 case 'A':
