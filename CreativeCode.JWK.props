@@ -2,7 +2,7 @@
 
   <!-- Solution-wide properties for NuGet packaging -->
   <PropertyGroup>
-    <VersionPrefix>0.8.0</VersionPrefix>
+    <VersionPrefix>0.7.1</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
     <Authors>Alexander Zautke</Authors>
     <Company>Creative Code Consultancy</Company>
