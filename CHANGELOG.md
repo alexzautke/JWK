@@ -3,10 +3,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.7.1 - 2023-03-29
+
+### Changed
+- Added a check to verify that the used keyLength for an RSA key is less than the max length support by the RSACryptoServiceProvider in the .NET SDK.
+
 ## 0.7.0 - 2023-03-26
 
 ### Added
-Add option in JWK constructor to provide custom key length for RSA key (Note: A minimum key length of 2048bit (NIST recommendation) is still enforced)
+- Add option in JWK constructor to provide custom key length for RSA key (Note: A minimum key length of 2048bit (NIST recommendation) is still enforced)
 
 ## 0.6.1 - 2023-02-08
 
