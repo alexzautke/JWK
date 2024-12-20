@@ -25,12 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\TestRSA2048.key">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\TestRSA256.crt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>
