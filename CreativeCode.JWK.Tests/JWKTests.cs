@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using static CreativeCode.JWK.KeyParts.KeyParameter;
+using static CreativeCode.JWK.Base64Helper;
 
 namespace CreativeCode.JWK.Tests
 {
@@ -519,6 +523,140 @@ namespace CreativeCode.JWK.Tests
             var keySize = 20000;
 
             Assert.Throws<CryptographicException>(() => new JWK(algorithm, keyUse, keyOperations, keySize));
+        }
+
+        [Fact]
+        public void JWKWithRSA256CanBeCreatedFromKeyAndCrtFile()
+        {
+            string testClassDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var privateKeyFilePath = Path.Combine(testClassDirectory, "Resources/TestRSA2048.key");
+            var privateKeyPemContent = File.ReadAllText(privateKeyFilePath);
+            var privateKeyBase64 = privateKeyPemContent
+                .Replace("-----BEGIN PRIVATE KEY-----", "")
+                .Replace("-----END PRIVATE KEY-----", "")
+                .Replace("\n", "")
+                .Replace("\r", "");
+            var privateKeyBytes = Convert.FromBase64String(privateKeyBase64);
+            
+            using var rsa2048Key = RSA.Create();
+            rsa2048Key.ImportPkcs8PrivateKey(privateKeyBytes, out _);
+            
+            var crtFilePath = Path.Combine(testClassDirectory, "Resources/TestRSA256.crt");
+            X509Certificate2 x509Certificate = null;
+            try
+            {
+                x509Certificate = new X509Certificate2(crtFilePath);
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                Assert.Fail($"Certificate at path {crtFilePath} could not be found. Exception: '{e.Message}'");
+            }
+            catch (CryptographicException e)
+            {
+                Assert.Fail($"Certificate at path {crtFilePath} could not be validated. Exception: '{e.Message}'");
+            }
+            catch (Exception e)
+            {
+                Assert.Fail($"Unexpected exception occurred: '{e.Message}'");
+            }
+            
+            // KeyType
+            var x509PublicKeyAlgorithm = x509Certificate.PublicKey.Oid.FriendlyName; // The algorithm of the public key must match the algorithm of the private key
+            KeyType keyType = null;
+            switch (x509PublicKeyAlgorithm)
+            {
+                case "RSA":
+                    keyType = KeyType.RSA;
+                    break;
+                default:
+                    Assert.Fail($"Unknown public key algorithm: '{x509PublicKeyAlgorithm}'");
+                    break;
+            }
+            
+            // PublicKeyUse & KeyOperations, can't be extracted from the cert and need to be selected manually 
+            var keyUse = PublicKeyUse.Signature;
+            var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+            
+            // Algorithm
+            var x509PublicKeySignatureAlgorithm = x509Certificate.SignatureAlgorithm.FriendlyName;
+            Algorithm algorithm = null;
+            switch (x509PublicKeySignatureAlgorithm)
+            {
+                case "sha256RSA":
+                    algorithm = Algorithm.RS256;
+                    break;
+                case "sha384RSA":
+                    algorithm = Algorithm.RS384;
+                    break;
+                case "sha512RSA":
+                    algorithm = Algorithm.RS512;
+                    break;
+                default:
+                    Assert.Fail($"Unknown public key signature algorithm: '{x509PublicKeyAlgorithm}'");
+                    break;
+            }
+            
+            var x509PublicKey = x509Certificate.GetPublicKey();
+            string keyId = null;
+            using (var sha1 = SHA1.Create())
+            {
+                byte[] ski = sha1.ComputeHash(x509PublicKey);
+                keyId = BitConverter.ToString(ski).Replace("-", ":");
+            }
+
+            var keyTypeIndication = algorithm.Name.FirstOrDefault();
+            Dictionary<KeyParameter, string> keyParameters = null;
+            switch (keyTypeIndication)
+            {
+                case 'R':
+                    var rsaKey2048Parameters = rsa2048Key.ExportParameters(true);
+                    
+                    var modulus = Base64urlEncode(rsaKey2048Parameters.Modulus);
+                    var exponent = Base64urlEncode(rsaKey2048Parameters.Exponent);
+                    var privateExponent = Base64urlEncode(rsaKey2048Parameters.D);
+                    var firstPrimeFactor = Base64urlEncode(rsaKey2048Parameters.P);
+                    var secondPrimeFactor = Base64urlEncode(rsaKey2048Parameters.Q);
+                    var firstFactorCRTExponent = Base64urlEncode(rsaKey2048Parameters.DP);
+                    var secondFactorCRTExponent = Base64urlEncode(rsaKey2048Parameters.DQ);
+                    var firstCRTCoefficient = Base64urlEncode(rsaKey2048Parameters.InverseQ);
+                    
+                    keyParameters = new Dictionary<KeyParameter, string>
+                    {
+                        {RSAKeyParameterN, modulus},
+                        {RSAKeyParameterE, exponent},
+                        {RSAKeyParameterD, privateExponent},
+                        {RSAKeyParameterP, firstPrimeFactor},
+                        {RSAKeyParameterQ, secondPrimeFactor},
+                        {RSAKeyParameterDP, firstFactorCRTExponent},
+                        {RSAKeyParameterDQ, secondFactorCRTExponent},
+                        {RSAKeyParameterQI, firstCRTCoefficient}
+                    };
+                    break;
+            }
+
+            var jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, keyId);
+            
+            var jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+            
+            parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("alg", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("use", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("kid", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("n", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("e", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("d", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("p", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("q", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("dq", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("dp", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("qi", out var _).Should().BeTrue();
+            
+            parsedJWK.GetValue("kty").ToString().Should().Be("RSA");
+            parsedJWK.GetValue("alg").ToString().Should().Be(Algorithm.RS256.Name);
+            parsedJWK.GetValue("use").ToString().Should().Be(PublicKeyUse.Signature.KeyUse);
+            parsedJWK.GetValue("key_ops").Values<string>().Count().Should().Be(2);
+            parsedJWK.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(new[] { KeyOperation.ComputeDigitalSignature.Operation, KeyOperation.VerifyDigitalSignature.Operation });
         }
     }
 }
