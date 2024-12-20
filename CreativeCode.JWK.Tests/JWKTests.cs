@@ -528,11 +528,9 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithRSA256CanBeCreatedFromRsaKeyAndX509Certificate2()
         {
-            string testClassDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             using var rsa2048Key = RSA.Create();
             rsa2048Key.KeySize = 2048;
             
-            var crtFilePath = Path.Combine(testClassDirectory, "Resources/TestRSA256.crt"); // Valid until 18th Dec 2034, so might fail sometimes in the future
             var subject = new X500DistinguishedName("CN=TestCertificate");
             var certificateRequest = new CertificateRequest(
                 subject,
@@ -644,6 +642,117 @@ namespace CreativeCode.JWK.Tests
             
             parsedJWK.GetValue("kty").ToString().Should().Be("RSA");
             parsedJWK.GetValue("alg").ToString().Should().Be(Algorithm.RS256.Name);
+            parsedJWK.GetValue("use").ToString().Should().Be(PublicKeyUse.Signature.KeyUse);
+            parsedJWK.GetValue("key_ops").Values<string>().Count().Should().Be(2);
+            parsedJWK.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(new[] { KeyOperation.ComputeDigitalSignature.Operation, KeyOperation.VerifyDigitalSignature.Operation });
+        }
+        
+        [Fact]
+        public void JWKWithES256CanBeCreatedFromEcKeyAndX509Certificate2()
+        {
+            using var ecP256Key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+            
+            var subject = new X500DistinguishedName("CN=TestCertificate");
+            var certificateRequest = new CertificateRequest(
+                subject,
+                ecP256Key,
+                HashAlgorithmName.SHA256
+            );
+            certificateRequest.CertificateExtensions.Add(
+                new X509KeyUsageExtension(
+                    X509KeyUsageFlags.DigitalSignature,
+                    critical: true
+                )
+            );
+            var notBefore = DateTimeOffset.UtcNow;
+            var notAfter = notBefore.AddDays(1);
+            X509Certificate2 x509Certificate = certificateRequest.CreateSelfSigned(notBefore, notAfter);
+            
+            // KeyType
+            var x509PublicKeyAlgorithm = x509Certificate.PublicKey.Oid.FriendlyName; // The algorithm of the public key must match the algorithm of the private key
+            KeyType keyType = null;
+            switch (x509PublicKeyAlgorithm)
+            {
+                case "ECC":
+                    keyType = KeyType.EllipticCurve;
+                    break;
+                default:
+                    Assert.Fail($"Unknown public key algorithm: '{x509PublicKeyAlgorithm}'");
+                    break;
+            }
+            
+            // PublicKeyUse & KeyOperations, can't be extracted from the cert and need to be selected manually 
+            var keyUse = PublicKeyUse.Signature;
+            var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+            
+            // Algorithm
+            var x509PublicKeySignatureAlgorithm = x509Certificate.SignatureAlgorithm.FriendlyName;
+            Algorithm algorithm = null;
+            switch (x509PublicKeySignatureAlgorithm)
+            {
+                case "sha256ECDSA":
+                    algorithm = Algorithm.ES256;
+                    break;
+                case "sha384ECDSA":
+                    algorithm = Algorithm.ES384;
+                    break;
+                case "sha512ECDSA":
+                    algorithm = Algorithm.ES512;
+                    break;
+                default:
+                    Assert.Fail($"Unknown public key signature algorithm: '{x509PublicKeyAlgorithm}'");
+                    break;
+            }
+            
+            var x509PublicKey = x509Certificate.GetPublicKey();
+            string keyId = null;
+            using (var sha1 = SHA1.Create())
+            {
+                byte[] ski = sha1.ComputeHash(x509PublicKey);
+                keyId = BitConverter.ToString(ski).Replace("-", ":");
+            }
+
+            var keyTypeIndication = algorithm.Name.FirstOrDefault();
+            Dictionary<KeyParameter, string> keyParameters = null;
+            switch (keyTypeIndication)
+            {
+                case 'E':
+                    var ecP26KeyParameters = ecP256Key.ExportParameters(true);
+                    
+                    var privateKeyD = Base64urlEncode(ecP26KeyParameters.D);
+                    var publicKeyX = Base64urlEncode(ecP26KeyParameters.Q.X);
+                    var publicKeyY = Base64urlEncode(ecP26KeyParameters.Q.Y);
+                    
+                    var keyLength = algorithm.Name.Split(new string[] { "ES" }, StringSplitOptions.None)[1]; // Algorithm = 'ES' + Keylength
+                    var curveName = "P-" + keyLength;
+                    
+                    keyParameters = new Dictionary<KeyParameter, string>
+                    {
+                        {ECKeyParameterCRV, curveName},
+                        {ECKeyParameterX, publicKeyX},
+                        {ECKeyParameterY, publicKeyY},
+                        {ECKeyParameterD, privateKeyD}
+                    };
+                    
+                    break;
+            }
+
+            var jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, keyId);
+            
+            var jwkString = jwk.Export(true);
+            var parsedJWK = JObject.Parse(jwkString);
+            
+            parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("alg", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("use", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("kid", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("crv", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("x", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("y", out var _).Should().BeTrue();
+            parsedJWK.TryGetValue("d", out var _).Should().BeTrue();
+            
+            parsedJWK.GetValue("kty").ToString().Should().Be("EC");
+            parsedJWK.GetValue("alg").ToString().Should().Be(Algorithm.ES256.Name);
             parsedJWK.GetValue("use").ToString().Should().Be(PublicKeyUse.Signature.KeyUse);
             parsedJWK.GetValue("key_ops").Values<string>().Count().Should().Be(2);
             parsedJWK.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(new[] { KeyOperation.ComputeDigitalSignature.Operation, KeyOperation.VerifyDigitalSignature.Operation });
