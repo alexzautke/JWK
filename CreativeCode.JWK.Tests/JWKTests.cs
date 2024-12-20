@@ -631,14 +631,14 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.TryGetValue("alg", out var _).Should().BeTrue();
             parsedJWK.TryGetValue("use", out var _).Should().BeTrue();
             parsedJWK.TryGetValue("kid", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("n", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("e", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("d", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("p", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("q", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("dq", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("dp", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("qi", out var _).Should().BeTrue();
+            parsedJWK.GetValue("n").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterN));
+            parsedJWK.GetValue("e").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterE));
+            parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterD));
+            parsedJWK.GetValue("p").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterP));
+            parsedJWK.GetValue("q").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterQ));
+            parsedJWK.GetValue("dp").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterDP));
+            parsedJWK.GetValue("dq").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterDQ));
+            parsedJWK.GetValue("qi").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterQI));
             
             parsedJWK.GetValue("kty").ToString().Should().Be("RSA");
             parsedJWK.GetValue("alg").ToString().Should().Be(Algorithm.RS256.Name);
@@ -746,10 +746,10 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.TryGetValue("alg", out var _).Should().BeTrue();
             parsedJWK.TryGetValue("use", out var _).Should().BeTrue();
             parsedJWK.TryGetValue("kid", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("crv", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("x", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("y", out var _).Should().BeTrue();
-            parsedJWK.TryGetValue("d", out var _).Should().BeTrue();
+            parsedJWK.GetValue("crv").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterCRV));
+            parsedJWK.GetValue("x").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterX));
+            parsedJWK.GetValue("y").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterY));
+            parsedJWK.GetValue("d").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterD));
             
             parsedJWK.GetValue("kty").ToString().Should().Be("EC");
             parsedJWK.GetValue("alg").ToString().Should().Be(Algorithm.ES256.Name);
