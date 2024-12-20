@@ -549,15 +549,14 @@ namespace CreativeCode.JWK.Tests
             X509Certificate2 x509Certificate = certificateRequest.CreateSelfSigned(notBefore, notAfter);
             
             // KeyType
-            var x509PublicKeyAlgorithm = x509Certificate.PublicKey.Oid.FriendlyName; // The algorithm of the public key must match the algorithm of the private key
             KeyType keyType = null;
-            switch (x509PublicKeyAlgorithm)
+            switch (rsa2048Key)
             {
-                case "RSA":
+                case RSA:
                     keyType = KeyType.RSA;
                     break;
                 default:
-                    Assert.Fail($"Unknown public key algorithm: '{x509PublicKeyAlgorithm}'");
+                    Assert.Fail($"Unknown public key algorithm: '{rsa2048Key.GetType().Name}'");
                     break;
             }
             
@@ -580,7 +579,7 @@ namespace CreativeCode.JWK.Tests
                     algorithm = Algorithm.RS512;
                     break;
                 default:
-                    Assert.Fail($"Unknown public key signature algorithm: '{x509PublicKeyAlgorithm}'");
+                    Assert.Fail($"Unknown public key signature algorithm: '{x509PublicKeySignatureAlgorithm}'");
                     break;
             }
             
@@ -650,6 +649,7 @@ namespace CreativeCode.JWK.Tests
         [Fact]
         public void JWKWithES256CanBeCreatedFromEcKeyAndX509Certificate2()
         {
+            // Create key and cert
             using var ecP256Key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
             
             var subject = new X500DistinguishedName("CN=TestCertificate");
@@ -668,22 +668,21 @@ namespace CreativeCode.JWK.Tests
             var notAfter = notBefore.AddDays(1);
             X509Certificate2 x509Certificate = certificateRequest.CreateSelfSigned(notBefore, notAfter);
             
-            // KeyType
-            var x509PublicKeyAlgorithm = x509Certificate.PublicKey.Oid.FriendlyName; // The algorithm of the public key must match the algorithm of the private key
-            KeyType keyType = null;
-            switch (x509PublicKeyAlgorithm)
-            {
-                case "ECC":
-                    keyType = KeyType.EllipticCurve;
-                    break;
-                default:
-                    Assert.Fail($"Unknown public key algorithm: '{x509PublicKeyAlgorithm}'");
-                    break;
-            }
-            
             // PublicKeyUse & KeyOperations, can't be extracted from the cert and need to be selected manually 
             var keyUse = PublicKeyUse.Signature;
             var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+            
+            // KeyType
+            KeyType keyType = null;
+            switch (ecP256Key)
+            {
+                case ECDsa:
+                    keyType = KeyType.EllipticCurve;
+                    break;
+                default:
+                    Assert.Fail($"Unknown public key algorithm: '{ecP256Key.GetType().Name}'");
+                    break;
+            }
             
             // Algorithm
             var x509PublicKeySignatureAlgorithm = x509Certificate.SignatureAlgorithm.FriendlyName;
@@ -700,7 +699,7 @@ namespace CreativeCode.JWK.Tests
                     algorithm = Algorithm.ES512;
                     break;
                 default:
-                    Assert.Fail($"Unknown public key signature algorithm: '{x509PublicKeyAlgorithm}'");
+                    Assert.Fail($"Unknown public key signature algorithm: '{x509PublicKeySignatureAlgorithm}'");
                     break;
             }
             
