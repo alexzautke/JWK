@@ -584,6 +584,8 @@ namespace CreativeCode.JWK.Tests
             }
             
             var x509PublicKey = x509Certificate.GetPublicKey();
+            
+            // KeyID
             string keyId = null;
             using (var sha1 = SHA1.Create())
             {
@@ -591,6 +593,7 @@ namespace CreativeCode.JWK.Tests
                 keyId = BitConverter.ToString(ski).Replace("-", ":");
             }
 
+            // KeyParameters
             var keyTypeIndication = algorithm.Name.FirstOrDefault();
             Dictionary<KeyParameter, string> keyParameters = null;
             switch (keyTypeIndication)
