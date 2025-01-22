@@ -21,7 +21,7 @@
     <PackageReference Include="coverlet.collector" Version="6.0.4"><IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="FluentAssertions" Version="8.0.0" />
+    <PackageReference Include="FluentAssertions" Version="7.1.0" />
   </ItemGroup>
   
 </Project>
