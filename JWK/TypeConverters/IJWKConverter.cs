@@ -5,7 +5,7 @@ namespace CreativeCode.JWK.TypeConverters
 {
     internal interface IJWKConverter
     {
-        string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null);
+        string Serialize(KeyMembers members = KeyMembers.Public, object propertyValue = null);
         object Deserialize(JToken jwkRepresentation);
         object Deserialize(JObject jwkRepresentation);
     }

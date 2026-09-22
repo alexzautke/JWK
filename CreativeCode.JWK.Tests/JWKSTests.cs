@@ -19,7 +19,7 @@ public class JWKSTests
         var jwk = new JWK(algorithm, keyUse, keyOperations);
         var jwks = new JWKS(new[] {jwk});
 
-        string jwksString = jwks.Export(true);
+        string jwksString = jwks.Export(KeyMembers.All);
         var parsedJWKS = JObject.Parse(jwksString);
 
         parsedJWKS.TryGetValue("keys", out var keys);
@@ -64,7 +64,7 @@ public class JWKSTests
 
         var jwks = new JWKS(new[] {jwkRSA, jwkEC});
 
-        string jwksString = jwks.Export(true);
+        string jwksString = jwks.Export(KeyMembers.All);
         var parsedJWKS = JObject.Parse(jwksString);
 
         parsedJWKS.TryGetValue("keys", out var keys);
@@ -155,7 +155,7 @@ public class JWKSTests
         JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
         JWKS jwks = new JWKS(new[] {jwk});
         
-        string jwksString = jwks.Export(true);
+        string jwksString = jwks.Export(KeyMembers.All);
         var parsedJWKS = JObject.Parse(jwksString);
         var parsedJWK = parsedJWKS.GetValue("keys").First as JObject;
 

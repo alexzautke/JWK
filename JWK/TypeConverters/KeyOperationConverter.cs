@@ -20,7 +20,8 @@ namespace CreativeCode.JWK.TypeConverters
             foreach (var operation in jwkRepresentation.Children())
             {
                 var match = TryGetKeyOperation(operation?.ToString());
-                keyOperations.Add(match);
+                if (match is { }) // An empty entry carries no operation and would break serialization
+                    keyOperations.Add(match);
             }
 
             return keyOperations;
@@ -31,7 +32,7 @@ namespace CreativeCode.JWK.TypeConverters
             throw new NotImplementedException();
         }
 
-        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
+        public string Serialize(KeyMembers members = KeyMembers.Public, object propertyValue = null)
         {
             var operations = new HashSet<KeyOperation>(propertyValue as IEnumerable<KeyOperation>);
             var sb = new StringBuilder();
