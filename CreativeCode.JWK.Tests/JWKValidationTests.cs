@@ -282,12 +282,12 @@ namespace CreativeCode.JWK.Tests
         public void JWKSWithDuplicateKeyIdCannotBeParsed()
         {
             var first = JObject.Parse(new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
-            var second = JObject.Parse(new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
+            var second = JObject.Parse(new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
             second["kid"] = first.GetValue("kid").ToString();
             var jwks = new JObject { ["keys"] = new JArray(first, second) };
 
             JWKS.TryParse(jwks.ToString(), out _, out var errors).Should().BeFalse();
-            errors.Should().ContainSingle().Which.Should().Contain("used by more than one key");
+            errors.Should().ContainSingle().Which.Should().StartWith("Key at position 1:").And.Contain("used by more than one key");
         }
 
         [Fact]

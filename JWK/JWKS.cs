@@ -44,8 +44,9 @@ namespace CreativeCode.JWK
         /// <summary>
         /// Reads a JWKS from its JSON representation, reporting every reason why it is not a valid key set instead of
         /// throwing on the first one. Every entry of 'keys' has to be a JSON object, every key is checked as
-        /// <see cref="JWK.TryParse"/> checks it, and the key ids within the set are checked for duplicates. Errors are
-        /// prefixed with the position of the key they belong to.
+        /// <see cref="JWK.TryParse"/> checks it, and the key ids within the set are checked for duplicates: two keys of
+        /// the same key type may not share a key id, while keys of different key types may, as RFC 7517 - Section 4.5
+        /// allows. Errors are prefixed with the position of the key they belong to.
         /// A key whose key type ('kty') is not supported by this library is ignored and left out of the result, as
         /// RFC 7517 - Section 5 recommends; the JWKS is only rejected for it if no key of a supported key type remains.
         /// </summary>
@@ -94,7 +95,7 @@ namespace CreativeCode.JWK
             }
 
             var keys = new List<JWK>();
-            var keyIds = new HashSet<string>();
+            var keyIds = new HashSet<(string KeyType, string KeyID)>();
             for (var i = 0; i < keyTokens.Count; i++)
             {
                 // See RFC 7517 - Section 5: "keys" is an array of JWKs, and a JWK is a JSON object (Section 4)
@@ -114,8 +115,10 @@ namespace CreativeCode.JWK
                     continue;
                 }
 
-                if (key.KeyID is { } && !keyIds.Add(key.KeyID))
-                    validationErrors.Add($"Key at position {i}: the key id '{key.KeyID}' is used by more than one key in this set.");
+                // See RFC 7517 - Section 4.5: keys of different key types may use the same "kid", keys of the same key
+                // type should not. The normalised type is compared, so that the legacy "OCT" and "oct" count as one type
+                if (key.KeyID is { } && !keyIds.Add((key.KeyType?.Type, key.KeyID)))
+                    validationErrors.Add($"Key at position {i}: the key id '{key.KeyID}' is used by more than one key of type '{key.KeyType?.Type}' in this set.");
 
                 keys.Add(key);
             }

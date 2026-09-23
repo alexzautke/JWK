@@ -274,6 +274,40 @@ public class JWKSTests
     }
 
     [Fact]
+    public void JWKSWithSameKeyIdOnKeysOfDifferentKeyTypesCanBeParsed()
+    {
+        // See RFC 7517 - Section 4.5: keys of different key types may share a "kid"
+        var rsaKey = ExportedRSAKey();
+        var ecKey = JObject.Parse(new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
+        rsaKey["kid"] = "k1";
+        ecKey["kid"] = "k1";
+        var jwks = new JObject { ["keys"] = new JArray(rsaKey, ecKey) };
+
+        var success = JWKS.TryParse(jwks.ToString(), out var parsed, out var errors);
+
+        errors.Should().BeEmpty();
+        success.Should().BeTrue();
+        parsed.Keys.Select(key => key.KeyType).Should().Equal(KeyType.RSA, KeyType.EllipticCurve);
+        parsed.Keys.Should().OnlyContain(key => key.KeyID == "k1");
+    }
+
+    [Fact]
+    public void JWKSWithSameKeyIdOnLegacyAndRegisteredSymmetricKeyTypeCannotBeParsed()
+    {
+        // "OCT" is the spelling this library used up to 0.7.1 for the key type registered as "oct"
+        var legacyKey = JObject.Parse(new JWK(Algorithm.HS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }).Export(KeyMembers.All));
+        var registeredKey = JObject.Parse(new JWK(Algorithm.HS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }).Export(KeyMembers.All));
+        legacyKey["kty"] = "OCT";
+        registeredKey["kty"] = "oct";
+        registeredKey["kid"] = legacyKey.GetValue("kid").ToString();
+        var jwks = new JObject { ["keys"] = new JArray(legacyKey, registeredKey) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().StartWith("Key at position 1:").And.Contain("used by more than one key");
+    }
+
+    [Fact]
     public void JWKSWithKeyWithoutKeyTypeCannotBeParsed()
     {
         var keyWithoutKeyType = JObject.Parse(Ed25519Key);
