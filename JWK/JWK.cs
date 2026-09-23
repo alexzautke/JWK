@@ -309,7 +309,8 @@ namespace CreativeCode.JWK
                 Exponent = RequiredParameter(RSAKeyParameterE)
             };
 
-            var privateParameters = new[] { RSAKeyParameterD, RSAKeyParameterP, RSAKeyParameterQ, RSAKeyParameterDP, RSAKeyParameterDQ, RSAKeyParameterQI };
+            // Unlike a JWK, RSAParameters needs the CRT parameters as well as "d"
+            var privateParameters = new[] { RSAKeyParameterD }.Concat(RSAKeyParametersCRT).ToArray();
             var providedPrivateParameters = privateParameters.Where(HasParameter).ToList();
             if (providedPrivateParameters.Count == 0)
                 return parameters;
@@ -367,7 +368,7 @@ namespace CreativeCode.JWK
         public int GetKeySizeInBits()
         {
             if (KeyType == KeyType.RSA)
-                return JWKValidator.BitLength(RequiredParameter(RSAKeyParameterN));
+                return UnsignedInteger.BitLength(RequiredParameter(RSAKeyParameterN));
 
             if (KeyType == KeyType.EllipticCurve)
             {

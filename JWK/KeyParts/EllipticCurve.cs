@@ -56,9 +56,10 @@ namespace CreativeCode.JWK.KeyParts
             Name = name;
             Oid = oid;
             CoordinateLength = coordinateLength;
-            _prime = ParseHex(prime);
-            _b = ParseHex(b);
-            KeySizeInBits = (int)(_prime - 1).BitLength();
+            var primeOctets = ParseHex(prime);
+            _prime = ToBigInteger(primeOctets);
+            _b = ToBigInteger(ParseHex(b));
+            KeySizeInBits = UnsignedInteger.BitLength(primeOctets);
         }
 
         public static EllipticCurve TryGetCurve(string curve)
@@ -133,36 +134,18 @@ namespace CreativeCode.JWK.KeyParts
             return new BigInteger(littleEndian);
         }
 
-        private static BigInteger ParseHex(string hex)
+        private static byte[] ParseHex(string hex)
         {
             var bytes = new byte[hex.Length / 2];
             for (var i = 0; i < bytes.Length; i++)
                 bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
 
-            return ToBigInteger(bytes);
+            return bytes;
         }
 
         public override string ToString()
         {
             return Name;
-        }
-    }
-
-    internal static class BigIntegerExtensions
-    {
-        /// <summary>
-        /// BigInteger.GetBitLength is not available on netstandard2.0.
-        /// </summary>
-        internal static long BitLength(this BigInteger value)
-        {
-            long bitLength = 0;
-            while (value > 0)
-            {
-                bitLength++;
-                value >>= 1;
-            }
-
-            return bitLength;
         }
     }
 }
