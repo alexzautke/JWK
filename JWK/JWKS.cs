@@ -43,8 +43,9 @@ namespace CreativeCode.JWK
 
         /// <summary>
         /// Reads a JWKS from its JSON representation, reporting every reason why it is not a valid key set instead of
-        /// throwing on the first one. Every key is checked as <see cref="JWK.TryParse"/> checks it, and the key ids
-        /// within the set are checked for duplicates. Errors are prefixed with the position of the key they belong to.
+        /// throwing on the first one. Every entry of 'keys' has to be a JSON object, every key is checked as
+        /// <see cref="JWK.TryParse"/> checks it, and the key ids within the set are checked for duplicates. Errors are
+        /// prefixed with the position of the key they belong to.
         /// A key whose key type ('kty') is not supported by this library is ignored and left out of the result, as
         /// RFC 7517 - Section 5 recommends; the JWKS is only rejected for it if no key of a supported key type remains.
         /// </summary>
@@ -96,6 +97,13 @@ namespace CreativeCode.JWK
             var keyIds = new HashSet<string>();
             for (var i = 0; i < keyTokens.Count; i++)
             {
+                // See RFC 7517 - Section 5: "keys" is an array of JWKs, and a JWK is a JSON object (Section 4)
+                if (!(keyTokens[i] is JObject))
+                {
+                    validationErrors.Add($"Key at position {i}: A JWK MUST be a JSON object.");
+                    continue;
+                }
+
                 // See RFC 7517 - Section 5: JWKs with a "kty" value which is not understood SHOULD be ignored
                 if (HasUnsupportedKeyType(keyTokens[i]))
                     continue;

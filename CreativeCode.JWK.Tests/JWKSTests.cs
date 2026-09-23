@@ -249,6 +249,30 @@ public class JWKSTests
         }
     }
 
+    [Theory]
+    [InlineData("string")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("array")]
+    [InlineData("boolean")]
+    public void JWKSWithKeyWhichIsNotAJSONObjectCannotBeParsed(string entryKind)
+    {
+        JToken entry = entryKind switch
+        {
+            "string" => new JValue(ExportedRSAKey().ToString()), // A valid key, but encoded as a JSON string
+            "null" => JValue.CreateNull(),
+            "number" => new JValue(42),
+            "array" => new JArray(ExportedRSAKey()),
+            "boolean" => new JValue(true),
+            _ => throw new System.ArgumentException(entryKind)
+        };
+        var jwks = new JObject { ["keys"] = new JArray(ExportedRSAKey(), entry) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().Be("Key at position 1: A JWK MUST be a JSON object.");
+    }
+
     [Fact]
     public void JWKSWithKeyWithoutKeyTypeCannotBeParsed()
     {
