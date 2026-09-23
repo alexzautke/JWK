@@ -3,8 +3,7 @@
   <Import Project="..\CreativeCode.JWK.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Library</OutputType>
     <Authors>Alexander Zautke</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -17,7 +16,6 @@
     <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWK</PackageId>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

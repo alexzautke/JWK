@@ -79,6 +79,10 @@ namespace CreativeCode.JWK.KeyParts
         /// an instance with <see cref="IsRecognized"/> set to false instead of null, so that the "alg" value of a JWK
         /// survives deserialization and export. Returns null only if <paramref name="algorithm"/> is null or empty.
         /// </summary>
+        /// <remarks>
+        /// Up to and including 0.7.1 an unknown name returned null. A caller which rejects an algorithm by checking the
+        /// result for null has to check <see cref="IsRecognized"/> instead, or it accepts any algorithm name.
+        /// </remarks>
         public static Algorithm TryGetAlgorithm(string algorithm)
         {
             return algorithm switch
@@ -112,12 +116,12 @@ namespace CreativeCode.JWK.KeyParts
             };
         }
 
-        public string Serialize(KeyMembers members = KeyMembers.Public, object propertyValue = null)
+        string IJWKConverter.Serialize(KeyMembers members, object propertyValue)
         {
             return Name;
         }
 
-        public object Deserialize(JToken jwkRepresentation)
+        object IJWKConverter.Deserialize(JToken jwkRepresentation)
         {
             if (jwkRepresentation is null)
                 return null;
@@ -125,7 +129,7 @@ namespace CreativeCode.JWK.KeyParts
             return TryGetAlgorithm(jwkRepresentation.ToString());
         }
 
-        public object Deserialize(JObject jwkRepresentation)
+        object IJWKConverter.Deserialize(JObject jwkRepresentation)
         {
             throw new NotImplementedException();
         }

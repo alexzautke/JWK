@@ -23,6 +23,18 @@ namespace CreativeCode.JWK.Tests
         }
 
         [Fact]
+        public void JWKWithDateLikeUnknownMemberRoundTrip()
+        {
+            using (new CultureScope("de-DE"))
+            {
+                var jwk = new JWK("{\"kty\":\"RSA\",\"n\":\"AQAB\",\"e\":\"AQAB\",\"custom\":\"2024-05-01T00:00:00.1234567+02:00\"}");
+
+                jwk.AdditionalMembers["custom"].Should().Be("\"2024-05-01T00:00:00.1234567+02:00\"");
+                jwk.Export(KeyMembers.All).Should().Contain("\"custom\":\"2024-05-01T00:00:00.1234567+02:00\"");
+            }
+        }
+
+        [Fact]
         public void JWKWithUnsupportedKeyTypeRoundTrip()
         {
             var jwk = new JWK("{\"kty\":\"OKP\",\"crv\":\"Ed25519\",\"x\":\"11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo\"}");

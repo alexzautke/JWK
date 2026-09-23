@@ -10,7 +10,6 @@ namespace CreativeCode.JWK.KeyParts
         private const string EC_VALUE = "EC";
         private const string RSA_VALUE = "RSA";
         private const string OCT_VALUE = "oct";
-        private const string OCT_LEGACY_VALUE = "OCT"; // Spelling used by this library up to and including 0.7.1
 
         public static readonly KeyType EllipticCurve = new KeyType(EC_VALUE);
         public static readonly KeyType RSA = new KeyType(RSA_VALUE);
@@ -32,12 +31,11 @@ namespace CreativeCode.JWK.KeyParts
                 EC_VALUE => EllipticCurve,
                 RSA_VALUE => RSA,
                 OCT_VALUE => OCT,
-                OCT_LEGACY_VALUE => OCT,
                 _ => null
             };
         }
 
-        public object Deserialize(JToken jwkRepresentation)
+        object IJWKConverter.Deserialize(JToken jwkRepresentation)
         {
             if (jwkRepresentation is null)
                 throw new ArgumentNullException("Key Type is a mandatory element and MUST be present");
@@ -45,12 +43,12 @@ namespace CreativeCode.JWK.KeyParts
             return TryGetKeyType(jwkRepresentation?.ToString());
         }
 
-        public object Deserialize(JObject jwkRepresentation)
+        object IJWKConverter.Deserialize(JObject jwkRepresentation)
         {
             throw new NotImplementedException();
         }
 
-        public string Serialize(KeyMembers members = KeyMembers.Public, object propertyValue = null)
+        string IJWKConverter.Serialize(KeyMembers members, object propertyValue)
         {
             return Type;
         }

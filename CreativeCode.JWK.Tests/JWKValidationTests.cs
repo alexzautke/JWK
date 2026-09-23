@@ -54,19 +54,46 @@ namespace CreativeCode.JWK.Tests
         }
 
         [Fact]
-        public void JWKWithLegacyCurveNameCanBeParsed()
+        public void JWKWithDateLikeKeyIdCanBeParsed()
         {
-            var exported = ExportedKey(Algorithm.ES512);
-            exported["crv"] = "P-512"; // The name this library used up to and including 0.7.1
+            using (new CultureScope("de-DE"))
+            {
+                var exported = ExportedKey(Algorithm.RS256);
+                exported["kid"] = "2024-05-01T00:00:00Z";
 
-            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeTrue();
-            errors.Should().BeEmpty();
-            jwk.GetCurve().Should().Be(EllipticCurve.P521);
+                var success = JWK.TryParse(exported.ToString(), out var jwk, out var errors);
+
+                errors.Should().BeEmpty();
+                success.Should().BeTrue();
+                jwk.KeyID.Should().Be("2024-05-01T00:00:00Z");
+            }
         }
 
         #endregion Valid keys
 
         #region Structural errors
+
+        [Fact]
+        public void JWKWithLegacyCurveNameCannotBeParsed()
+        {
+            var exported = ExportedKey(Algorithm.ES512);
+            exported["crv"] = "P-512"; // The unregistered name this library used up to and including 0.7.1
+
+            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeFalse();
+            jwk.Should().BeNull();
+            errors.Should().Contain("The curve 'P-512' is not supported.");
+        }
+
+        [Fact]
+        public void JWKWithLegacyKeyTypeSpellingCannotBeParsed()
+        {
+            var exported = ExportedKey(Algorithm.HS256);
+            exported["kty"] = "OCT"; // The unregistered spelling this library used up to and including 0.7.1
+
+            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeFalse();
+            jwk.Should().BeNull();
+            errors.Should().ContainSingle().Which.Should().Be("The key type 'OCT' is not supported.");
+        }
 
         [Fact]
         public void JWKWithoutKeyTypeCannotBeParsed()
@@ -137,6 +164,44 @@ namespace CreativeCode.JWK.Tests
 
             JWK.TryParse(exported.ToString(), out _, out var errors).Should().BeFalse();
             errors.Should().ContainSingle().Which.Should().Contain("('key_ops') MUST be a JSON string");
+        }
+
+        [Theory]
+        [InlineData("sign", "sign")] // A registered operation
+        [InlineData("sign", "verify", "sign")] // Not adjacent
+        [InlineData("x-custom", "x-custom")] // An operation this library does not know
+        public void JWKWithDuplicateKeyOperationCannotBeParsed(params string[] keyOperations)
+        {
+            // See RFC 7517 - Section 4.3: "Duplicate key operation values MUST NOT be present in the array"
+            var exported = ExportedKey(Algorithm.RS256);
+            exported["key_ops"] = new JArray(keyOperations);
+
+            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeFalse();
+            jwk.Should().BeNull();
+            errors.Should().ContainSingle().Which.Should().Be($"The key operations ('key_ops') contain '{keyOperations[0]}' more than once. Duplicate key operation values MUST NOT be present.");
+        }
+
+        [Fact]
+        public void JWKWithKeyOperationsDifferingOnlyInCaseCanBeParsed()
+        {
+            // Key operation values are case-sensitive (RFC 7517 - Section 4.3), so "sign" and "Sign" are not duplicates
+            var exported = ExportedKey(Algorithm.RS256);
+            exported["key_ops"] = new JArray("sign", "Sign");
+
+            JWK.TryParse(exported.ToString(), out _, out var errors).Should().BeTrue();
+            errors.Should().BeEmpty();
+        }
+
+        [Fact]
+        public void JWKSWithDuplicateKeyOperationCannotBeParsed()
+        {
+            var exported = ExportedKey(Algorithm.RS256);
+            exported["key_ops"] = new JArray("sign", "sign");
+            var jwks = new JObject { ["keys"] = new JArray(exported) };
+
+            JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+            parsed.Should().BeNull();
+            errors.Should().ContainSingle().Which.Should().StartWith("Key at position 0:").And.Contain("more than once");
         }
 
         [Fact]
@@ -266,12 +331,12 @@ namespace CreativeCode.JWK.Tests
         public void JWKSWithDuplicateKeyIdCannotBeParsed()
         {
             var first = JObject.Parse(new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
-            var second = JObject.Parse(new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
+            var second = JObject.Parse(new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
             second["kid"] = first.GetValue("kid").ToString();
             var jwks = new JObject { ["keys"] = new JArray(first, second) };
 
             JWKS.TryParse(jwks.ToString(), out _, out var errors).Should().BeFalse();
-            errors.Should().ContainSingle().Which.Should().Contain("used by more than one key");
+            errors.Should().ContainSingle().Which.Should().StartWith("Key at position 1:").And.Contain("used by more than one key");
         }
 
         [Fact]

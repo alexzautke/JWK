@@ -34,7 +34,7 @@ Building JSON Web Key Sets is also supported.
 
 The following configuration has been succesfully tested for building and running the project:
 
-* .NET 8 / netstandard2.0
+* .NET 10
 
 ![Build status](https://github.com/alexzautke/JWK/actions/workflows/main.yml/badge.svg)
 
@@ -78,7 +78,11 @@ if (!JWK.TryParse(json, out var jwk, out var errors))
 
 What is checked is key validity as RFC 7517 and RFC 7518 define it: a supported key type, the presence and encoding
 of the key parameters that key type requires, a known curve, coordinates padded to the size of that curve, a public
-key which really is a point on the curve it claims, and unique key ids within a key set.
+key which really is a point on the curve it claims, no duplicate `key_ops` values, every entry of the `keys` of a key set being a JSON object, and
+unique key ids among the keys of the same key type within a key set (keys of different key types may share a key id,
+as RFC 7517 - Section 4.5 allows). `JWKS.TryParse` ignores a key whose key type is not supported, as RFC 7517 -
+Section 5 recommends, and only rejects the set if no key of a supported key type remains; `JWK.TryParse` rejects such
+a key.
 
 What is *not* checked is policy - which algorithms you accept, how large a key has to be, or whether a `kid` is
 required. That is yours to decide; `GetKeySizeInBits()` gives you the measurement to decide it with.

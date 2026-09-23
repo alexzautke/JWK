@@ -9,6 +9,7 @@ using CreativeCode.JWK.KeyParts;
 using CreativeCode.JWK.TypeConverters;
 using CreativeCode.JWK.Validation;
 using System.Linq;
+using System.Numerics;
 using static CreativeCode.JWK.KeyParts.KeyParameter;
 using static CreativeCode.JWK.Base64Helper;
 
@@ -50,8 +51,6 @@ namespace CreativeCode.JWK
         /// </summary>
         public IReadOnlyDictionary<string, string> AdditionalMembers { get; private set; } = new Dictionary<string, string>();
 
-        internal KeyMembers _exportedMembers;
-
         private JWK() { } // Used only for deserialization
 
         internal void SetAdditionalMembers(IReadOnlyDictionary<string, string> additionalMembers)
@@ -68,7 +67,7 @@ namespace CreativeCode.JWK
         {
             try
             {
-                var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk);
+                var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk, JsonReading.SerializerSettings);
 
                 KeyType = deserializeJWK.KeyType;
                 PublicKeyUse = deserializeJWK.PublicKeyUse;
@@ -107,7 +106,7 @@ namespace CreativeCode.JWK
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null, Algorithm algorithm = null, string keyId = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
-            KeyOperations = new HashSet<KeyOperation>(keyOperations);
+            KeyOperations = keyOperations is null ? null : new HashSet<KeyOperation>(keyOperations);
             Algorithm = algorithm;
             KeyID = keyId;
         }
@@ -166,9 +165,6 @@ namespace CreativeCode.JWK
                     rsaKeySize ??= MinimumRsaKeySize;
                     rsaKeySize = Math.Max(rsaKeySize.Value, MinimumRsaKeySize);
 
-                    if(rsaKeySize is null)
-                        throw new InvalidOperationException("rsaKeySize must be provided if a key with KeyType RSA is initialized");
-
                     if (rsaKeySize > MaximumRsaKeySize)
                         throw new CryptographicException($"rsaKeySize is too large. Maximum key size is '{MaximumRsaKeySize}' bits");
 
@@ -180,9 +176,8 @@ namespace CreativeCode.JWK
                 case 'E':
                     ECParameters();
                     break;
-                default:
-                    NONEParameters();
-                    break;
+                default: // Unreachable: the constructor only accepts algorithms it can create a key for
+                    throw new InvalidOperationException($"Cannot create a new key for algorithm '{Algorithm.Name}'.");
             }
 
             #if DEBUG
@@ -200,17 +195,12 @@ namespace CreativeCode.JWK
         /// </param>
         public string Export(KeyMembers members = KeyMembers.Public)
         {
-            _exportedMembers = members;
             if (members == KeyMembers.Public && IsSymmetric())
-                throw new CryptographicException("Symmetric key of type " + (KeyType?.Serialize() ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
+                throw new CryptographicException("Symmetric key of type " + (KeyType?.Type ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
 
-            return JsonConvert.SerializeObject(this);
-        }
-
-        [Obsolete("Use Export(KeyMembers) instead. Export(true) is Export(KeyMembers.All), Export(false) is Export(KeyMembers.Public).")]
-        public string Export(bool shouldExportPrivateKey)
-        {
-            return Export(shouldExportPrivateKey ? KeyMembers.All : KeyMembers.Public);
+            // The members travel with the value which is serialized, so that concurrent exports of this JWK with
+            // different members cannot see each other's choice
+            return JsonConvert.SerializeObject(new JWKExport(this, members));
         }
 
         #region Validating parse
@@ -240,7 +230,7 @@ namespace CreativeCode.JWK
             JObject jwkRepresentation;
             try
             {
-                jwkRepresentation = JObject.Parse(jwk);
+                jwkRepresentation = JsonReading.ParseObject(jwk);
             }
             catch (JsonException e)
             {
@@ -248,14 +238,25 @@ namespace CreativeCode.JWK
                 return false;
             }
 
-            validationErrors.AddRange(JWKValidator.ValidateRepresentation(jwkRepresentation));
+            return TryRead(jwkRepresentation, out result, out errors);
+        }
+
+        /// <summary>
+        /// <see cref="TryParse"/> for a JWK whose JSON has already been parsed, e.g. as part of a JWKS, so that it
+        /// does not have to be written out and parsed again.
+        /// </summary>
+        internal static bool TryRead(JObject jwkRepresentation, out JWK result, out IReadOnlyCollection<string> errors)
+        {
+            result = null;
+            var validationErrors = JWKValidator.ValidateRepresentation(jwkRepresentation);
+            errors = validationErrors;
             if (validationErrors.Count > 0)
                 return false; // A JWK whose JSON does not have the expected shape cannot be read reliably
 
             JWK parsedJWK;
             try
             {
-                parsedJWK = new JWK(jwk);
+                parsedJWK = JWKConverter.Read(jwkRepresentation);
             }
             catch (Exception e)
             {
@@ -305,7 +306,8 @@ namespace CreativeCode.JWK
                 Exponent = RequiredParameter(RSAKeyParameterE)
             };
 
-            var privateParameters = new[] { RSAKeyParameterD, RSAKeyParameterP, RSAKeyParameterQ, RSAKeyParameterDP, RSAKeyParameterDQ, RSAKeyParameterQI };
+            // Unlike a JWK, RSAParameters needs the CRT parameters as well as "d"
+            var privateParameters = new[] { RSAKeyParameterD }.Concat(RSAKeyParametersCRT).ToArray();
             var providedPrivateParameters = privateParameters.Where(HasParameter).ToList();
             if (providedPrivateParameters.Count == 0)
                 return parameters;
@@ -363,7 +365,7 @@ namespace CreativeCode.JWK
         public int GetKeySizeInBits()
         {
             if (KeyType == KeyType.RSA)
-                return JWKValidator.BitLength(RequiredParameter(RSAKeyParameterN));
+                return (int)new BigInteger(RequiredParameter(RSAKeyParameterN), isUnsigned: true, isBigEndian: true).GetBitLength();
 
             if (KeyType == KeyType.EllipticCurve)
             {
@@ -431,7 +433,7 @@ namespace CreativeCode.JWK
         {
             var curve = EllipticCurve.TryGetCurveForAlgorithm(Algorithm);
             if (curve is null)
-                throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm.Serialize());
+                throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm.Name);
 
             ECDsa eCDsa = ECDsa.Create();
             eCDsa.GenerateKey(curve.ToECCurve());
@@ -488,7 +490,7 @@ namespace CreativeCode.JWK
                Section 5.3.4 Security Effect of the HMAC Key
             */
             HMAC hmac;
-            switch (Algorithm.Serialize()){
+            switch (Algorithm.Name){
                 case "HS256":
                     hmac = new HMACSHA256(CreateHMACKey(64));
                     break;
@@ -499,7 +501,7 @@ namespace CreativeCode.JWK
                     hmac = new HMACSHA512(CreateHMACKey(128));
                     break;
                 default:
-                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm.Serialize() + " (Could not parse expected SHA version)");
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm.Name + " (Could not parse expected SHA version)");
             }
 
             var key = Base64urlEncode(hmac.Key);
@@ -510,10 +512,7 @@ namespace CreativeCode.JWK
         }
 
         private byte[] CreateHMACKey(int keySize){
-            byte[] key = new byte[keySize];
-            var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-            rngCryptoServiceProvider.GetBytes(key);
-            return key;
+            return RandomNumberGenerator.GetBytes(keySize);
         }
 
         private void AESParameters()
@@ -521,11 +520,11 @@ namespace CreativeCode.JWK
             var aesKey = Aes.Create();
 
             Regex keySizeRegex = new Regex(@"(?<keySize>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(Algorithm.Serialize());
+            var matches = keySizeRegex.Match(Algorithm.Name);
             var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
             var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
             if(!aesKey.ValidKeySize(aesKeySize)) {
-                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm.Serialize() + " (Could not parse expected AES key size)");
+                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm.Name + " (Could not parse expected AES key size)");
             }
             aesKey.KeySize = aesKeySize;
             aesKey.GenerateKey();
@@ -535,11 +534,6 @@ namespace CreativeCode.JWK
             {
                 {OctKeyParameterK, key}
             };
-        }
-
-        private void NONEParameters()
-        {
-            KeyParameters = null;
         }
 
         #endregion Create digital keys

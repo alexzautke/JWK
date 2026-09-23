@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,6 +18,16 @@ namespace CreativeCode.JWK.TypeConverters
             "kty", "use", "key_ops", "alg", "kid", "x5u", "x5c", "x5t", "x5t#S256"
         };
 
+        // Reading PropertyInfo.CustomAttributes builds the attribute data from metadata again on every access, which
+        // cost more than everything else in reading or exporting a JWK together. Neither the properties of a type nor
+        // their attributes change at runtime, so they are only looked up once.
+        private static readonly ConcurrentDictionary<Type, PropertyInfo[]> Properties = new ConcurrentDictionary<Type, PropertyInfo[]>();
+        private static readonly ConcurrentDictionary<PropertyInfo, CustomAttributeData[]> Attributes = new ConcurrentDictionary<PropertyInfo, CustomAttributeData[]>();
+
+        private static PropertyInfo[] PropertiesOf(Type type) => Properties.GetOrAdd(type, t => t.GetProperties());
+
+        private static CustomAttributeData[] AttributesOf(PropertyInfo property) => Attributes.GetOrAdd(property, p => p.CustomAttributes.ToArray());
+
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(JWK);
@@ -26,13 +38,20 @@ namespace CreativeCode.JWK.TypeConverters
             if (!(objectType == typeof(JWK)))
                 throw new ArgumentException("JWK Converter can only objects deserialize of type 'JWK'. Found object of type " + objectType.Name + " instead.");
 
-            JObject jo = JObject.Load(reader);
-            var jwk = Activator.CreateInstance(objectType, true) as JWK;
+            return Read(JsonReading.LoadObject(reader));
+        }
 
-            var properties = objectType.GetProperties(); // Get all public properties
+        /// <summary>
+        /// Builds a JWK from its already parsed JSON representation.
+        /// </summary>
+        internal static JWK Read(JObject jo)
+        {
+            var jwk = Activator.CreateInstance(typeof(JWK), true) as JWK;
+
+            var properties = PropertiesOf(typeof(JWK)); // Get all public properties
             foreach (var property in properties)
             {
-                foreach (var customAttributeData in property.CustomAttributes)
+                foreach (var customAttributeData in AttributesOf(property))
                 {
                     if (customAttributeData.AttributeType != typeof(JsonPropertyAttribute))
                         break; // Only deserialize fields which are marked with "JsonProperty"
@@ -42,7 +61,7 @@ namespace CreativeCode.JWK.TypeConverters
                     var propertyName = propertyNameArgument.TypedValue.Value as string;
                     jo.TryGetValue(propertyName, out var token);
 
-                    var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
+                    var customConverterAttribute = AttributesOf(property).FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
                     if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
                     {
                         var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
@@ -111,23 +130,36 @@ namespace CreativeCode.JWK.TypeConverters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is JWK))
+            // JWK.Export passes the members to write along with the key. A JWK which is serialized directly, without
+            // JWK.Export, is written with its public members only.
+            JWK jwk;
+            KeyMembers members;
+            if (value is JWKExport export)
+            {
+                jwk = export.Key;
+                members = export.Members;
+            }
+            else if (value is JWK key)
+            {
+                jwk = key;
+                members = KeyMembers.Public;
+            }
+            else
                 throw new ArgumentException("JWK Converter can only objects serialize the type 'JWK'. Found object of type " + value.GetType() + " instead.");
 
             writer.WriteStartObject();
 
-            var type = value.GetType();
-            var properties = type.GetProperties(); // Get all public properties
-            var members = ((JWK)value)._exportedMembers;
+            var type = jwk.GetType();
+            var properties = PropertiesOf(type); // Get all public properties
             var isFirstMember = true;
 
             foreach (var property in properties)
             {
-                var propertyValue = property.GetValue(value);
+                var propertyValue = property.GetValue(jwk);
                 if (propertyValue is null)
                     continue;
 
-                foreach (var customAttribute in property.CustomAttributes){
+                foreach (var customAttribute in AttributesOf(property)){
 
                     if (customAttribute.AttributeType != typeof(JsonPropertyAttribute))
                         break; // Only serialize fields which are marked with "JsonProperty"
@@ -135,7 +167,7 @@ namespace CreativeCode.JWK.TypeConverters
                     var customJSONPropertyName = customAttribute.NamedArguments.ElementAtOrDefault(0).TypedValue.ToString();
                     var member = string.Empty;
 
-                    var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
+                    var customConverterAttribute = AttributesOf(property).FirstOrDefault(a => a.AttributeType == typeof(JWKConverterAttribute));
                     if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
                     {
                         var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
@@ -161,7 +193,7 @@ namespace CreativeCode.JWK.TypeConverters
                 }
             }
 
-            foreach (var additionalMember in ((JWK)value).AdditionalMembers)
+            foreach (var additionalMember in jwk.AdditionalMembers)
             {
                 if (members == KeyMembers.Public && !RegisteredPublicMembers.Contains(additionalMember.Key))
                     continue;
@@ -181,5 +213,23 @@ namespace CreativeCode.JWK.TypeConverters
                 writer.WriteRaw(",");
         }
 
+    }
+
+    /// <summary>
+    /// A JWK together with the members an export of it writes. <see cref="JWK.Export(KeyMembers)"/> serializes this
+    /// instead of the JWK itself, so that which members are written is part of the call rather than state stored on
+    /// the JWK, which a concurrent export with other members could change halfway through.
+    /// </summary>
+    [JsonConverter(typeof(JWKConverter))]
+    internal sealed class JWKExport
+    {
+        internal JWK Key { get; }
+        internal KeyMembers Members { get; }
+
+        internal JWKExport(JWK key, KeyMembers members)
+        {
+            Key = key;
+            Members = members;
+        }
     }
 }

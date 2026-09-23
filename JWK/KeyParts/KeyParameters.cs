@@ -44,6 +44,10 @@ namespace CreativeCode.JWK.KeyParts
 
         public static readonly IReadOnlyCollection<KeyParameter> RSAKeyParameters = new[] { RSAKeyParameterN, RSAKeyParameterE, RSAKeyParameterD, RSAKeyParameterP, RSAKeyParameterQ, RSAKeyParameterDP, RSAKeyParameterDQ, RSAKeyParameterQI, RSAKeyParameterOTH };
 
+        // The private key parameters of an RSA key other than "d" (and "oth"): all of them or none of them (RFC 7518 -
+        // Section 6.3.2)
+        internal static readonly IReadOnlyCollection<KeyParameter> RSAKeyParametersCRT = new[] { RSAKeyParameterP, RSAKeyParameterQ, RSAKeyParameterDP, RSAKeyParameterDQ, RSAKeyParameterQI };
+
         public static readonly KeyParameter ECKeyParameterCRV = new KeyParameter("crv", false, KeyParameterEncoding.Text);
         public static readonly KeyParameter ECKeyParameterX = new KeyParameter("x", false, KeyParameterEncoding.Base64urlOctets);
         public static readonly KeyParameter ECKeyParameterY = new KeyParameter("y", false, KeyParameterEncoding.Base64urlOctets);

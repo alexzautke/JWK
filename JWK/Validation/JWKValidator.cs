@@ -58,6 +58,16 @@ namespace CreativeCode.JWK.Validation
                     errors.Add("The key operations ('key_ops') MUST be a JSON array.");
                 else if (keyOperationTokens.Any(keyOperation => keyOperation.Type != JTokenType.String))
                     errors.Add("Every entry of the key operations ('key_ops') MUST be a JSON string.");
+                else
+                {
+                    // "Duplicate key operation values MUST NOT be present in the array". Values are case-sensitive.
+                    var duplicates = keyOperationTokens
+                        .Select(keyOperation => keyOperation.ToString())
+                        .GroupBy(keyOperation => keyOperation, StringComparer.Ordinal)
+                        .Where(group => group.Count() > 1);
+                    foreach (var duplicate in duplicates)
+                        errors.Add($"The key operations ('key_ops') contain '{duplicate.Key}' more than once. Duplicate key operation values MUST NOT be present.");
+                }
             }
 
             foreach (var parameter in KeyParameter.ParametersFor(keyType))
@@ -134,10 +144,10 @@ namespace CreativeCode.JWK.Validation
         private static List<string> ValidateRSAPrivateKey(IDictionary<KeyParameter, string> keyParameters)
         {
             var errors = new List<string>();
-            var otherPrivateParameters = new[] { KeyParameter.RSAKeyParameterP, KeyParameter.RSAKeyParameterQ, KeyParameter.RSAKeyParameterDP, KeyParameter.RSAKeyParameterDQ, KeyParameter.RSAKeyParameterQI };
+            var otherPrivateParameters = KeyParameter.RSAKeyParametersCRT;
 
             var missing = otherPrivateParameters.Where(parameter => !keyParameters.ContainsKey(parameter) || string.IsNullOrEmpty(keyParameters[parameter])).ToList();
-            if (missing.Count == 0 || missing.Count == otherPrivateParameters.Length)
+            if (missing.Count == 0 || missing.Count == otherPrivateParameters.Count)
                 return errors;
 
             errors.Add($"The private RSA key is incomplete. The key parameters '{string.Join("', '", missing.Select(parameter => parameter.Name))}' are missing.");
@@ -182,26 +192,6 @@ namespace CreativeCode.JWK.Validation
             }
 
             return errors;
-        }
-
-        /// <summary>
-        /// The bit length of a big endian unsigned integer. BitOperations.LeadingZeroCount is not available on
-        /// netstandard2.0.
-        /// </summary>
-        internal static int BitLength(byte[] bigEndianUnsigned)
-        {
-            var firstNonZero = 0;
-            while (firstNonZero < bigEndianUnsigned.Length && bigEndianUnsigned[firstNonZero] == 0x00)
-                firstNonZero++;
-
-            if (firstNonZero == bigEndianUnsigned.Length)
-                return 0;
-
-            var bitLength = (bigEndianUnsigned.Length - firstNonZero - 1) * 8;
-            for (var octet = bigEndianUnsigned[firstNonZero]; octet != 0; octet >>= 1)
-                bitLength++;
-
-            return bitLength;
         }
     }
 }

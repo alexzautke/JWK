@@ -13,7 +13,6 @@ namespace CreativeCode.JWK.KeyParts
         private const string P256_VALUE = "P-256";
         private const string P384_VALUE = "P-384";
         private const string P521_VALUE = "P-521";
-        private const string P521_LEGACY_VALUE = "P-512"; // Name used by this library up to and including 0.7.1 for the curve of ES512
 
         // Domain parameters of the NIST prime curves. For all three, the curve is y^2 = x^3 - 3x + b over GF(p).
         private const string P256_PRIME = "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF";
@@ -57,9 +56,9 @@ namespace CreativeCode.JWK.KeyParts
             Name = name;
             Oid = oid;
             CoordinateLength = coordinateLength;
-            _prime = ParseHex(prime);
-            _b = ParseHex(b);
-            KeySizeInBits = (int)(_prime - 1).BitLength();
+            _prime = ToBigInteger(Convert.FromHexString(prime));
+            _b = ToBigInteger(Convert.FromHexString(b));
+            KeySizeInBits = (int)_prime.GetBitLength();
         }
 
         public static EllipticCurve TryGetCurve(string curve)
@@ -69,7 +68,6 @@ namespace CreativeCode.JWK.KeyParts
                 P256_VALUE => P256,
                 P384_VALUE => P384,
                 P521_VALUE => P521,
-                P521_LEGACY_VALUE => P521,
                 _ => null
             };
         }
@@ -123,48 +121,16 @@ namespace CreativeCode.JWK.KeyParts
         }
 
         /// <summary>
-        /// Reads a big-endian unsigned integer. BigInteger(byte[]) is little-endian and two's complement on
-        /// netstandard2.0, so the octets are reversed and a zero octet is appended to keep the value positive.
+        /// Reads a big-endian unsigned integer.
         /// </summary>
         internal static BigInteger ToBigInteger(byte[] bigEndianUnsigned)
         {
-            var littleEndian = new byte[bigEndianUnsigned.Length + 1];
-            for (var i = 0; i < bigEndianUnsigned.Length; i++)
-                littleEndian[i] = bigEndianUnsigned[bigEndianUnsigned.Length - 1 - i];
-
-            return new BigInteger(littleEndian);
-        }
-
-        private static BigInteger ParseHex(string hex)
-        {
-            var bytes = new byte[hex.Length / 2];
-            for (var i = 0; i < bytes.Length; i++)
-                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-
-            return ToBigInteger(bytes);
+            return new BigInteger(bigEndianUnsigned, isUnsigned: true, isBigEndian: true);
         }
 
         public override string ToString()
         {
             return Name;
-        }
-    }
-
-    internal static class BigIntegerExtensions
-    {
-        /// <summary>
-        /// BigInteger.GetBitLength is not available on netstandard2.0.
-        /// </summary>
-        internal static long BitLength(this BigInteger value)
-        {
-            long bitLength = 0;
-            while (value > 0)
-            {
-                bitLength++;
-                value >>= 1;
-            }
-
-            return bitLength;
         }
     }
 }

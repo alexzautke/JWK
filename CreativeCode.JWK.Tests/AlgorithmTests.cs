@@ -12,7 +12,9 @@ namespace CreativeCode.JWK.Tests
         public void AlgorithmCanBeSerialized()
         {
             var algorithm = Algorithm.RS384;
-            algorithm.Serialize().Should().Be(algorithm.Name, "The name of the algorithm should be serialized");
+            var jwk = new JWK(algorithm, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature });
+
+            JObject.Parse(jwk.Export()).GetValue("alg").ToString().Should().Be(algorithm.Name, "The name of the algorithm should be serialized");
         }
 
         [Theory]

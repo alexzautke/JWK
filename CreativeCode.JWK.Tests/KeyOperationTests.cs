@@ -10,6 +10,17 @@ namespace CreativeCode.JWK.Tests
     public class KeyOperationTests
     {
         [Fact]
+        public void JWKFromKeyParametersWithoutKeyOperationsHasNoKeyOperations()
+        {
+            var keyParameters = new Dictionary<KeyParameter, string> { [KeyParameter.OctKeyParameterK] = "AQAB" };
+
+            var jwk = new JWK(KeyType.OCT, keyParameters, PublicKeyUse.Signature); // keyOperations left at its default
+
+            jwk.KeyOperations.Should().BeNull();
+            JObject.Parse(jwk.Export(KeyMembers.All)).ContainsKey("key_ops").Should().BeFalse();
+        }
+
+        [Fact]
         public void DuplicateKeyOperationsAreNotSerialized()
         {
             var keyOps = new List<KeyOperation>() { KeyOperation.ComputeDigitalSignature, KeyOperation.ComputeDigitalSignature }; // Add duplicate key_op
