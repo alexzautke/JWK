@@ -56,10 +56,9 @@ namespace CreativeCode.JWK.KeyParts
             Name = name;
             Oid = oid;
             CoordinateLength = coordinateLength;
-            var primeOctets = ParseHex(prime);
-            _prime = ToBigInteger(primeOctets);
-            _b = ToBigInteger(ParseHex(b));
-            KeySizeInBits = UnsignedInteger.BitLength(primeOctets);
+            _prime = ToBigInteger(Convert.FromHexString(prime));
+            _b = ToBigInteger(Convert.FromHexString(b));
+            KeySizeInBits = (int)_prime.GetBitLength();
         }
 
         public static EllipticCurve TryGetCurve(string curve)
@@ -122,25 +121,11 @@ namespace CreativeCode.JWK.KeyParts
         }
 
         /// <summary>
-        /// Reads a big-endian unsigned integer. BigInteger(byte[]) is little-endian and two's complement on
-        /// netstandard2.0, so the octets are reversed and a zero octet is appended to keep the value positive.
+        /// Reads a big-endian unsigned integer.
         /// </summary>
         internal static BigInteger ToBigInteger(byte[] bigEndianUnsigned)
         {
-            var littleEndian = new byte[bigEndianUnsigned.Length + 1];
-            for (var i = 0; i < bigEndianUnsigned.Length; i++)
-                littleEndian[i] = bigEndianUnsigned[bigEndianUnsigned.Length - 1 - i];
-
-            return new BigInteger(littleEndian);
-        }
-
-        private static byte[] ParseHex(string hex)
-        {
-            var bytes = new byte[hex.Length / 2];
-            for (var i = 0; i < bytes.Length; i++)
-                bytes[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-
-            return bytes;
+            return new BigInteger(bigEndianUnsigned, isUnsigned: true, isBigEndian: true);
         }
 
         public override string ToString()

@@ -9,6 +9,7 @@ using CreativeCode.JWK.KeyParts;
 using CreativeCode.JWK.TypeConverters;
 using CreativeCode.JWK.Validation;
 using System.Linq;
+using System.Numerics;
 using static CreativeCode.JWK.KeyParts.KeyParameter;
 using static CreativeCode.JWK.Base64Helper;
 
@@ -364,7 +365,7 @@ namespace CreativeCode.JWK
         public int GetKeySizeInBits()
         {
             if (KeyType == KeyType.RSA)
-                return UnsignedInteger.BitLength(RequiredParameter(RSAKeyParameterN));
+                return (int)new BigInteger(RequiredParameter(RSAKeyParameterN), isUnsigned: true, isBigEndian: true).GetBitLength();
 
             if (KeyType == KeyType.EllipticCurve)
             {
@@ -511,10 +512,7 @@ namespace CreativeCode.JWK
         }
 
         private byte[] CreateHMACKey(int keySize){
-            byte[] key = new byte[keySize];
-            var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
-            rngCryptoServiceProvider.GetBytes(key);
-            return key;
+            return RandomNumberGenerator.GetBytes(keySize);
         }
 
         private void AESParameters()

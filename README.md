@@ -34,7 +34,7 @@ Building JSON Web Key Sets is also supported.
 
 The following configuration has been succesfully tested for building and running the project:
 
-* .NET 8 / netstandard2.0
+* .NET 10
 
 ![Build status](https://github.com/alexzautke/JWK/actions/workflows/main.yml/badge.svg)
 
