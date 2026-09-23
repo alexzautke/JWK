@@ -105,7 +105,7 @@ namespace CreativeCode.JWK
         public JWK(KeyType keyType, Dictionary<KeyParameter, string> keyParameters, PublicKeyUse publicKeyUse = null, IEnumerable<KeyOperation> keyOperations = null, Algorithm algorithm = null, string keyId = null): this(keyType, keyParameters)
         {
             PublicKeyUse = publicKeyUse;
-            KeyOperations = new HashSet<KeyOperation>(keyOperations);
+            KeyOperations = keyOperations is null ? null : new HashSet<KeyOperation>(keyOperations);
             Algorithm = algorithm;
             KeyID = keyId;
         }
