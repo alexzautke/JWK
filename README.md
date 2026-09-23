@@ -78,7 +78,7 @@ if (!JWK.TryParse(json, out var jwk, out var errors))
 
 What is checked is key validity as RFC 7517 and RFC 7518 define it: a supported key type, the presence and encoding
 of the key parameters that key type requires, a known curve, coordinates padded to the size of that curve, a public
-key which really is a point on the curve it claims, every entry of the `keys` of a key set being a JSON object, and
+key which really is a point on the curve it claims, no duplicate `key_ops` values, every entry of the `keys` of a key set being a JSON object, and
 unique key ids among the keys of the same key type within a key set (keys of different key types may share a key id,
 as RFC 7517 - Section 4.5 allows). `JWKS.TryParse` ignores a key whose key type is not supported, as RFC 7517 -
 Section 5 recommends, and only rejects the set if no key of a supported key type remains; `JWK.TryParse` rejects such

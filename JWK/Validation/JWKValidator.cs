@@ -58,6 +58,16 @@ namespace CreativeCode.JWK.Validation
                     errors.Add("The key operations ('key_ops') MUST be a JSON array.");
                 else if (keyOperationTokens.Any(keyOperation => keyOperation.Type != JTokenType.String))
                     errors.Add("Every entry of the key operations ('key_ops') MUST be a JSON string.");
+                else
+                {
+                    // "Duplicate key operation values MUST NOT be present in the array". Values are case-sensitive.
+                    var duplicates = keyOperationTokens
+                        .Select(keyOperation => keyOperation.ToString())
+                        .GroupBy(keyOperation => keyOperation, StringComparer.Ordinal)
+                        .Where(group => group.Count() > 1);
+                    foreach (var duplicate in duplicates)
+                        errors.Add($"The key operations ('key_ops') contain '{duplicate.Key}' more than once. Duplicate key operation values MUST NOT be present.");
+                }
             }
 
             foreach (var parameter in KeyParameter.ParametersFor(keyType))
