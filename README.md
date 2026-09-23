@@ -78,7 +78,9 @@ if (!JWK.TryParse(json, out var jwk, out var errors))
 
 What is checked is key validity as RFC 7517 and RFC 7518 define it: a supported key type, the presence and encoding
 of the key parameters that key type requires, a known curve, coordinates padded to the size of that curve, a public
-key which really is a point on the curve it claims, and unique key ids within a key set.
+key which really is a point on the curve it claims, and unique key ids within a key set. `JWKS.TryParse` ignores a
+key whose key type is not supported, as RFC 7517 - Section 5 recommends, and only rejects the set if no key of a
+supported key type remains; `JWK.TryParse` rejects such a key.
 
 What is *not* checked is policy - which algorithms you accept, how large a key has to be, or whether a `kid` is
 required. That is yours to decide; `GetKeySizeInBits()` gives you the measurement to decide it with.

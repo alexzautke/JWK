@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
+using CreativeCode.JWK.KeyParts;
 using CreativeCode.JWK.TypeConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -44,6 +45,8 @@ namespace CreativeCode.JWK
         /// Reads a JWKS from its JSON representation, reporting every reason why it is not a valid key set instead of
         /// throwing on the first one. Every key is checked as <see cref="JWK.TryParse"/> checks it, and the key ids
         /// within the set are checked for duplicates. Errors are prefixed with the position of the key they belong to.
+        /// A key whose key type ('kty') is not supported by this library is ignored and left out of the result, as
+        /// RFC 7517 - Section 5 recommends; the JWKS is only rejected for it if no key of a supported key type remains.
         /// </summary>
         /// <param name="jwks">The JSON representation of the JWKS.</param>
         /// <param name="result">The JWKS, or null if it could not be read.</param>
@@ -93,6 +96,10 @@ namespace CreativeCode.JWK
             var keyIds = new HashSet<string>();
             for (var i = 0; i < keyTokens.Count; i++)
             {
+                // See RFC 7517 - Section 5: JWKs with a "kty" value which is not understood SHOULD be ignored
+                if (HasUnsupportedKeyType(keyTokens[i]))
+                    continue;
+
                 if (!JWK.TryParse(keyTokens[i].ToString(), out var key, out var keyErrors))
                 {
                     validationErrors.AddRange(keyErrors.Select(error => $"Key at position {i}: {error}"));
@@ -108,8 +115,26 @@ namespace CreativeCode.JWK
             if (validationErrors.Count > 0)
                 return false;
 
+            if (keys.Count == 0)
+            {
+                validationErrors.Add("The JWKS contains no key of a supported key type.");
+                return false;
+            }
+
             result = new JWKS(keys);
             return true;
+        }
+
+        /// <summary>
+        /// Whether the given entry of the 'keys' array is a JSON object with a key type ('kty') which is a JSON string
+        /// but not one this library supports. A missing or malformed key type is not covered: it is reported as an error.
+        /// </summary>
+        private static bool HasUnsupportedKeyType(JToken keyToken)
+        {
+            return keyToken is JObject keyRepresentation
+                && keyRepresentation.TryGetValue("kty", out var keyTypeToken)
+                && keyTypeToken.Type == JTokenType.String
+                && KeyType.TryGetKeyType(keyTypeToken.ToString()) is null;
         }
 
         /// <summary>

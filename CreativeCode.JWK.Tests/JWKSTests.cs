@@ -176,4 +176,49 @@ public class JWKSTests
         jwks.Keys.First().Algorithm.Should().Be(algorithm);
         jwks.Keys.First().KeyParameters.Should().BeEquivalentTo(keyParameters);
     }
+
+    private const string Ed25519Key = "{\"kty\":\"OKP\",\"crv\":\"Ed25519\",\"x\":\"11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo\"}";
+
+    private static JObject ExportedRSAKey()
+    {
+        var jwk = new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature });
+        return JObject.Parse(jwk.Export(KeyMembers.Public));
+    }
+
+    [Fact]
+    public void JWKSIgnoresKeyOfUnsupportedKeyType()
+    {
+        var rsaKey = ExportedRSAKey();
+        var jwks = new JObject { ["keys"] = new JArray(rsaKey, JObject.Parse(Ed25519Key)) };
+
+        var success = JWKS.TryParse(jwks.ToString(), out var parsed, out var errors);
+
+        errors.Should().BeEmpty();
+        success.Should().BeTrue();
+        parsed.Keys.Should().ContainSingle();
+        parsed.Keys.Single().KeyType.Should().Be(KeyType.RSA);
+        parsed.Keys.Single().KeyID.Should().Be(rsaKey.GetValue("kid").ToString());
+    }
+
+    [Fact]
+    public void JWKSWithOnlyUnsupportedKeyTypesCannotBeParsed()
+    {
+        var jwks = new JObject { ["keys"] = new JArray(JObject.Parse(Ed25519Key), JObject.Parse(Ed25519Key)) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().Be("The JWKS contains no key of a supported key type.");
+    }
+
+    [Fact]
+    public void JWKSWithKeyWithoutKeyTypeCannotBeParsed()
+    {
+        var keyWithoutKeyType = JObject.Parse(Ed25519Key);
+        keyWithoutKeyType.Remove("kty");
+        var jwks = new JObject { ["keys"] = new JArray(ExportedRSAKey(), keyWithoutKeyType) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().StartWith("Key at position 1:").And.Contain("('kty') is missing");
+    }
 }
