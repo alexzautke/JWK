@@ -32,6 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - "unwrapKey" was deserialized as `KeyOperation.DeriveKey` and "deriveKey" as `KeyOperation.DecryptKeyAndValidateDecryption`. Both now map to the operation they name.
 - A "key_ops" entry which could not be recognized was added to the key operations as null, which threw a `NullReferenceException` when the JWK was exported again.
 - A JWK whose only members could not be serialized (e.g. a key without a key type) produced JSON with a leading or stray comma.
+- Exporting the same JWK or JWKS concurrently with different `KeyMembers` could write private key members into a public export: the requested members were stored on the instance for the serializer to read back, so an `Export(KeyMembers.All)` on one thread could change what an `Export(KeyMembers.Public)` on another thread wrote. The members are now passed along with the call and no longer stored on the JWK or JWKS.
 - A string which looks like a date - a "kid" such as "2024-05-01T00:00:00Z", for example - was read as a date by Json.NET. `TryParse` then rejected the member as not being a JSON string, and the constructors replaced its value with a culture dependent rendering of that date (e.g. "05/01/2024 00:00:00"), which also changed members kept in `AdditionalMembers`. JWK and JWKS JSON is now read without date parsing, so every string keeps the value it was written with.
 
 ## 0.7.1 - 2023-03-29

@@ -50,8 +50,6 @@ namespace CreativeCode.JWK
         /// </summary>
         public IReadOnlyDictionary<string, string> AdditionalMembers { get; private set; } = new Dictionary<string, string>();
 
-        internal KeyMembers _exportedMembers;
-
         private JWK() { } // Used only for deserialization
 
         internal void SetAdditionalMembers(IReadOnlyDictionary<string, string> additionalMembers)
@@ -200,11 +198,12 @@ namespace CreativeCode.JWK
         /// </param>
         public string Export(KeyMembers members = KeyMembers.Public)
         {
-            _exportedMembers = members;
             if (members == KeyMembers.Public && IsSymmetric())
                 throw new CryptographicException("Symmetric key of type " + (KeyType?.Serialize() ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
 
-            return JsonConvert.SerializeObject(this);
+            // The members travel with the value which is serialized, so that concurrent exports of this JWK with
+            // different members cannot see each other's choice
+            return JsonConvert.SerializeObject(new JWKExport(this, members));
         }
 
         [Obsolete("Use Export(KeyMembers) instead. Export(true) is Export(KeyMembers.All), Export(false) is Export(KeyMembers.Public).")]

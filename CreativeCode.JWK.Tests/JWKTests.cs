@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
@@ -788,6 +789,29 @@ namespace CreativeCode.JWK.Tests
 
                 jwk.KeyID.Should().Be("2024-05-01T00:00:00Z");
             }
+        }
+
+        [Fact]
+        public void JWKConcurrentPublicExportDoesNotContainPrivateMembers()
+        {
+            var jwk = new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature });
+            var privateMembers = new[] { "d", "p", "q", "dp", "dq", "qi" };
+            var leaks = 0;
+
+            Parallel.For(0, 20000, i =>
+            {
+                if (i % 2 == 0)
+                {
+                    jwk.Export(KeyMembers.All);
+                    return;
+                }
+
+                var exported = JObject.Parse(jwk.Export(KeyMembers.Public));
+                if (privateMembers.Any(member => exported.ContainsKey(member)))
+                    Interlocked.Increment(ref leaks);
+            });
+
+            leaks.Should().Be(0, "a public export must never contain private key material");
         }
 
         [Fact]

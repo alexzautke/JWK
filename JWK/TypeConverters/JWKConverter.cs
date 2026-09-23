@@ -111,19 +111,32 @@ namespace CreativeCode.JWK.TypeConverters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is JWK))
+            // JWK.Export passes the members to write along with the key. A JWK which is serialized directly, without
+            // JWK.Export, is written with its public members only.
+            JWK jwk;
+            KeyMembers members;
+            if (value is JWKExport export)
+            {
+                jwk = export.Key;
+                members = export.Members;
+            }
+            else if (value is JWK key)
+            {
+                jwk = key;
+                members = KeyMembers.Public;
+            }
+            else
                 throw new ArgumentException("JWK Converter can only objects serialize the type 'JWK'. Found object of type " + value.GetType() + " instead.");
 
             writer.WriteStartObject();
 
-            var type = value.GetType();
+            var type = jwk.GetType();
             var properties = type.GetProperties(); // Get all public properties
-            var members = ((JWK)value)._exportedMembers;
             var isFirstMember = true;
 
             foreach (var property in properties)
             {
-                var propertyValue = property.GetValue(value);
+                var propertyValue = property.GetValue(jwk);
                 if (propertyValue is null)
                     continue;
 
@@ -161,7 +174,7 @@ namespace CreativeCode.JWK.TypeConverters
                 }
             }
 
-            foreach (var additionalMember in ((JWK)value).AdditionalMembers)
+            foreach (var additionalMember in jwk.AdditionalMembers)
             {
                 if (members == KeyMembers.Public && !RegisteredPublicMembers.Contains(additionalMember.Key))
                     continue;
@@ -181,5 +194,23 @@ namespace CreativeCode.JWK.TypeConverters
                 writer.WriteRaw(",");
         }
 
+    }
+
+    /// <summary>
+    /// A JWK together with the members an export of it writes. <see cref="JWK.Export(KeyMembers)"/> serializes this
+    /// instead of the JWK itself, so that which members are written is part of the call rather than state stored on
+    /// the JWK, which a concurrent export with other members could change halfway through.
+    /// </summary>
+    [JsonConverter(typeof(JWKConverter))]
+    internal sealed class JWKExport
+    {
+        internal JWK Key { get; }
+        internal KeyMembers Members { get; }
+
+        internal JWKExport(JWK key, KeyMembers members)
+        {
+            Key = key;
+            Members = members;
+        }
     }
 }

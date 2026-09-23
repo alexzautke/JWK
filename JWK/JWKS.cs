@@ -16,8 +16,6 @@ namespace CreativeCode.JWK
         [JsonProperty(PropertyName = "keys")]
         public IEnumerable<JWK> Keys { get; private set; }             // REQUIRED
 
-        internal KeyMembers _exportedMembers;
-
         public JWKS(string jwks)
         {
             try
@@ -162,15 +160,15 @@ namespace CreativeCode.JWK
                 performanceStopWatch.Start();
             #endif
 
-            _exportedMembers = members;
-
             foreach (var key in Keys)
             {
                 if(key.IsSymmetric() && members == KeyMembers.Public)
                     throw new CryptographicException("Symmetric key of type " + (key.KeyType?.Serialize() ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
             }
 
-            var jwksJSON = JsonConvert.SerializeObject(this);
+            // The members travel with the value which is serialized, so that concurrent exports of this JWKS with
+            // different members cannot see each other's choice
+            var jwksJSON = JsonConvert.SerializeObject(new JWKSExport(this, members));
 
             #if DEBUG
                 performanceStopWatch.Stop();

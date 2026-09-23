@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
 using Newtonsoft.Json;
@@ -303,6 +305,33 @@ public class JWKSTests
         JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeTrue();
         errors.Should().BeEmpty();
         parsed.Keys.Should().ContainSingle().Which.KeyType.Should().Be(KeyType.RSA);
+    }
+
+    [Fact]
+    public void JWKSConcurrentPublicExportDoesNotContainPrivateMembers()
+    {
+        var jwks = new JWKS(new[]
+        {
+            new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }),
+            new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature })
+        });
+        var privateMembers = new[] { "d", "p", "q", "dp", "dq", "qi" };
+        var leaks = 0;
+
+        Parallel.For(0, 20000, i =>
+        {
+            if (i % 2 == 0)
+            {
+                jwks.Export(KeyMembers.All);
+                return;
+            }
+
+            var exported = JObject.Parse(jwks.Export(KeyMembers.Public));
+            if (exported.GetValue("keys").Children<JObject>().Any(key => privateMembers.Any(member => key.ContainsKey(member))))
+                Interlocked.Increment(ref leaks);
+        });
+
+        leaks.Should().Be(0, "a public export must never contain private key material");
     }
 
     [Fact]
