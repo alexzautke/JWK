@@ -22,7 +22,7 @@ namespace CreativeCode.JWK
         {
             try
             {
-                var deserializeJWKS = JsonConvert.DeserializeObject<JWKS>(jwks);
+                var deserializeJWKS = JsonConvert.DeserializeObject<JWKS>(jwks, JsonReading.SerializerSettings);
                 Keys = deserializeJWKS.Keys;
             }
             catch(JsonReaderException e)
@@ -66,7 +66,7 @@ namespace CreativeCode.JWK
             JObject jwksRepresentation;
             try
             {
-                jwksRepresentation = JObject.Parse(jwks);
+                jwksRepresentation = JsonReading.ParseObject(jwks);
             }
             catch (JsonException e)
             {

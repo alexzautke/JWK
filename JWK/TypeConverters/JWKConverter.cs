@@ -26,7 +26,7 @@ namespace CreativeCode.JWK.TypeConverters
             if (!(objectType == typeof(JWK)))
                 throw new ArgumentException("JWK Converter can only objects deserialize of type 'JWK'. Found object of type " + objectType.Name + " instead.");
 
-            JObject jo = JObject.Load(reader);
+            JObject jo = JsonReading.LoadObject(reader);
             var jwk = Activator.CreateInstance(objectType, true) as JWK;
 
             var properties = objectType.GetProperties(); // Get all public properties

@@ -68,7 +68,7 @@ namespace CreativeCode.JWK
         {
             try
             {
-                var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk);
+                var deserializeJWK = JsonConvert.DeserializeObject<JWK>(jwk, JsonReading.SerializerSettings);
 
                 KeyType = deserializeJWK.KeyType;
                 PublicKeyUse = deserializeJWK.PublicKeyUse;
@@ -240,7 +240,7 @@ namespace CreativeCode.JWK
             JObject jwkRepresentation;
             try
             {
-                jwkRepresentation = JObject.Parse(jwk);
+                jwkRepresentation = JsonReading.ParseObject(jwk);
             }
             catch (JsonException e)
             {

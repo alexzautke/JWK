@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using static CreativeCode.JWK.KeyParts.KeyParameter;
@@ -764,6 +765,29 @@ namespace CreativeCode.JWK.Tests
             var jwk = new JWK("{\"kty\":\"RSA\",\"n\":\"AQAB\",\"e\":\"AQAB\",\"kid\":\"a\\\"b\"}");
 
             JObject.Parse(jwk.Export(KeyMembers.Public)).GetValue("kid").ToString().Should().Be("a\"b");
+        }
+
+        [Fact]
+        public void JWKWithDateLikeKeyIdKeepsItsValue()
+        {
+            using (new CultureScope("de-DE"))
+            {
+                var jwk = new JWK("{\"kty\":\"RSA\",\"n\":\"AQAB\",\"e\":\"AQAB\",\"kid\":\"2024-05-01T00:00:00Z\"}");
+
+                jwk.KeyID.Should().Be("2024-05-01T00:00:00Z");
+                jwk.Export(KeyMembers.Public).Should().Contain("\"kid\":\"2024-05-01T00:00:00Z\"");
+            }
+        }
+
+        [Fact]
+        public void JWKWithDateLikeKeyIdKeepsItsValueWhenDeserializedDirectly()
+        {
+            using (new CultureScope("de-DE"))
+            {
+                var jwk = JsonConvert.DeserializeObject<JWK>("{\"kty\":\"RSA\",\"n\":\"AQAB\",\"e\":\"AQAB\",\"kid\":\"2024-05-01T00:00:00Z\"}");
+
+                jwk.KeyID.Should().Be("2024-05-01T00:00:00Z");
+            }
         }
 
         [Fact]

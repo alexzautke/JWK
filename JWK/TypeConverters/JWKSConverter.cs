@@ -18,7 +18,7 @@ namespace CreativeCode.JWK.TypeConverters
             if (!(objectType == typeof(JWKS)))
                 throw new ArgumentException("JWKS Converter can only objects deserialize of type 'JWKS'. Found object of type " + objectType.Name + " instead.");
             
-            JObject jo = JObject.Load(reader);
+            JObject jo = JsonReading.LoadObject(reader);
             
             var success = jo.TryGetValue("keys", out var token);
             if (!success)

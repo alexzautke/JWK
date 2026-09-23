@@ -54,6 +54,22 @@ namespace CreativeCode.JWK.Tests
         }
 
         [Fact]
+        public void JWKWithDateLikeKeyIdCanBeParsed()
+        {
+            using (new CultureScope("de-DE"))
+            {
+                var exported = ExportedKey(Algorithm.RS256);
+                exported["kid"] = "2024-05-01T00:00:00Z";
+
+                var success = JWK.TryParse(exported.ToString(), out var jwk, out var errors);
+
+                errors.Should().BeEmpty();
+                success.Should().BeTrue();
+                jwk.KeyID.Should().Be("2024-05-01T00:00:00Z");
+            }
+        }
+
+        [Fact]
         public void JWKWithLegacyCurveNameCanBeParsed()
         {
             var exported = ExportedKey(Algorithm.ES512);

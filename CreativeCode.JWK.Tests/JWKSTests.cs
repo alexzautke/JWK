@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using static CreativeCode.JWK.KeyParts.KeyParameter;
@@ -208,6 +209,44 @@ public class JWKSTests
         JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
         parsed.Should().BeNull();
         errors.Should().ContainSingle().Which.Should().Be("The JWKS contains no key of a supported key type.");
+    }
+
+    private static string JWKSWithDateLikeKeyId()
+    {
+        var rsaKey = ExportedRSAKey();
+        rsaKey["kid"] = "2024-05-01T00:00:00Z";
+        return new JObject { ["keys"] = new JArray(rsaKey) }.ToString();
+    }
+
+    [Fact]
+    public void JWKSWithDateLikeKeyIdCanBeParsed()
+    {
+        using (new CultureScope("de-DE"))
+        {
+            var success = JWKS.TryParse(JWKSWithDateLikeKeyId(), out var parsed, out var errors);
+
+            errors.Should().BeEmpty();
+            success.Should().BeTrue();
+            parsed.Keys.Single().KeyID.Should().Be("2024-05-01T00:00:00Z");
+        }
+    }
+
+    [Fact]
+    public void JWKSWithDateLikeKeyIdKeepsItsValue()
+    {
+        using (new CultureScope("de-DE"))
+        {
+            new JWKS(JWKSWithDateLikeKeyId()).Keys.Single().KeyID.Should().Be("2024-05-01T00:00:00Z");
+        }
+    }
+
+    [Fact]
+    public void JWKSWithDateLikeKeyIdKeepsItsValueWhenDeserializedDirectly()
+    {
+        using (new CultureScope("de-DE"))
+        {
+            JsonConvert.DeserializeObject<JWKS>(JWKSWithDateLikeKeyId()).Keys.Single().KeyID.Should().Be("2024-05-01T00:00:00Z");
+        }
     }
 
     [Fact]
