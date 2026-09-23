@@ -3,12 +3,11 @@
   <Import Project="..\CreativeCode.JWK.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <TargetFramework>net10.0</TargetFramework>
     <OutputType>Library</OutputType>
     <Authors>Alexander Zautke</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageLicenseUrl>https://github.com/alexzautke/JWK/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Owners>Alexander Zautke</Owners>
     <PackageProjectUrl>https://github.com/alexzautke/JWK</PackageProjectUrl>
     <Summary>C# JWKs - JSON Web Keys (RFC7517)</Summary>
@@ -17,11 +16,10 @@
     <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWK</PackageId>
-    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   
 </Project>

@@ -13,12 +13,12 @@ namespace CreativeCode.JWK.TypeConverters
             return objectType == typeof(JWKS);
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (!(objectType == typeof(JWKS)))
                 throw new ArgumentException("JWKS Converter can only objects deserialize of type 'JWKS'. Found object of type " + objectType.Name + " instead.");
             
-            JObject jo = JObject.Load(reader);
+            JObject jo = JsonReading.LoadObject(reader);
             
             var success = jo.TryGetValue("keys", out var token);
             if (!success)
@@ -33,26 +33,59 @@ namespace CreativeCode.JWK.TypeConverters
             return new JWKS(keys);
         }
         
-        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (!(value is JWKS))
+            // JWKS.Export passes the members to write along with the key set. A JWKS which is serialized directly,
+            // without JWKS.Export, is written with the public members of its keys only.
+            JWKS jwks;
+            KeyMembers members;
+            if (value is JWKSExport export)
+            {
+                jwks = export.KeySet;
+                members = export.Members;
+            }
+            else if (value is JWKS keySet)
+            {
+                jwks = keySet;
+                members = KeyMembers.Public;
+            }
+            else
                 throw new ArgumentException("JWKS Converter can only objects serialize the type 'JWKS'. Found object of type " + value.GetType() + " instead.");
             
             writer.WriteStartObject();
             writer.WritePropertyName("keys");
             writer.WriteStartArray();
 
-            var jwks = (JWKS) value;
-            for(var i = 0; i < jwks.Keys.Count(); i++)
+            var isFirstKey = true;
+            foreach (var key in jwks.Keys)
             {
-                var keyJSON = jwks.Keys.ElementAt(i).Export(jwks._shouldExportPrivateKey);
-                writer.WriteRaw(keyJSON);
-                if (i + 1 != jwks.Keys.Count())
+                if (!isFirstKey)
                     writer.WriteRaw(",");
+                isFirstKey = false;
+
+                writer.WriteRaw(key.Export(members));
             }
             
             writer.WriteEndArray();
             writer.WriteEndObject();
+        }
+    }
+
+    /// <summary>
+    /// A JWKS together with the members an export of its keys writes. <see cref="JWKS.Export(KeyMembers)"/> serializes
+    /// this instead of the JWKS itself, so that which members are written is part of the call rather than state stored
+    /// on the JWKS, which a concurrent export with other members could change halfway through.
+    /// </summary>
+    [JsonConverter(typeof(JWKSConverter))]
+    internal sealed class JWKSExport
+    {
+        internal JWKS KeySet { get; }
+        internal KeyMembers Members { get; }
+
+        internal JWKSExport(JWKS keySet, KeyMembers members)
+        {
+            KeySet = keySet;
+            Members = members;
         }
     }
 }

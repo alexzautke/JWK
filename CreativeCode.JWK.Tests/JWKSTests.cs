@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CreativeCode.JWK.KeyParts;
 using FluentAssertions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using static CreativeCode.JWK.KeyParts.KeyParameter;
@@ -19,7 +22,7 @@ public class JWKSTests
         var jwk = new JWK(algorithm, keyUse, keyOperations);
         var jwks = new JWKS(new[] {jwk});
 
-        string jwksString = jwks.Export(true);
+        string jwksString = jwks.Export(KeyMembers.All);
         var parsedJWKS = JObject.Parse(jwksString);
 
         parsedJWKS.TryGetValue("keys", out var keys);
@@ -64,7 +67,7 @@ public class JWKSTests
 
         var jwks = new JWKS(new[] {jwkRSA, jwkEC});
 
-        string jwksString = jwks.Export(true);
+        string jwksString = jwks.Export(KeyMembers.All);
         var parsedJWKS = JObject.Parse(jwksString);
 
         parsedJWKS.TryGetValue("keys", out var keys);
@@ -155,7 +158,7 @@ public class JWKSTests
         JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
         JWKS jwks = new JWKS(new[] {jwk});
         
-        string jwksString = jwks.Export(true);
+        string jwksString = jwks.Export(KeyMembers.All);
         var parsedJWKS = JObject.Parse(jwksString);
         var parsedJWK = parsedJWKS.GetValue("keys").First as JObject;
 
@@ -175,5 +178,171 @@ public class JWKSTests
         jwks.Keys.First().KeyOperations.Should().BeEquivalentTo(keyOperations);
         jwks.Keys.First().Algorithm.Should().Be(algorithm);
         jwks.Keys.First().KeyParameters.Should().BeEquivalentTo(keyParameters);
+    }
+
+    private const string Ed25519Key = "{\"kty\":\"OKP\",\"crv\":\"Ed25519\",\"x\":\"11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo\"}";
+
+    private static JObject ExportedRSAKey()
+    {
+        var jwk = new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature });
+        return JObject.Parse(jwk.Export(KeyMembers.Public));
+    }
+
+    [Fact]
+    public void JWKSIgnoresKeyOfUnsupportedKeyType()
+    {
+        var rsaKey = ExportedRSAKey();
+        var jwks = new JObject { ["keys"] = new JArray(rsaKey, JObject.Parse(Ed25519Key)) };
+
+        var success = JWKS.TryParse(jwks.ToString(), out var parsed, out var errors);
+
+        errors.Should().BeEmpty();
+        success.Should().BeTrue();
+        parsed.Keys.Should().ContainSingle();
+        parsed.Keys.Single().KeyType.Should().Be(KeyType.RSA);
+        parsed.Keys.Single().KeyID.Should().Be(rsaKey.GetValue("kid").ToString());
+    }
+
+    [Fact]
+    public void JWKSWithOnlyUnsupportedKeyTypesCannotBeParsed()
+    {
+        var jwks = new JObject { ["keys"] = new JArray(JObject.Parse(Ed25519Key), JObject.Parse(Ed25519Key)) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().Be("The JWKS contains no key of a supported key type.");
+    }
+
+    private static string JWKSWithDateLikeKeyId()
+    {
+        var rsaKey = ExportedRSAKey();
+        rsaKey["kid"] = "2024-05-01T00:00:00Z";
+        return new JObject { ["keys"] = new JArray(rsaKey) }.ToString();
+    }
+
+    [Fact]
+    public void JWKSWithDateLikeKeyIdCanBeParsed()
+    {
+        using (new CultureScope("de-DE"))
+        {
+            var success = JWKS.TryParse(JWKSWithDateLikeKeyId(), out var parsed, out var errors);
+
+            errors.Should().BeEmpty();
+            success.Should().BeTrue();
+            parsed.Keys.Single().KeyID.Should().Be("2024-05-01T00:00:00Z");
+        }
+    }
+
+    [Fact]
+    public void JWKSWithDateLikeKeyIdKeepsItsValue()
+    {
+        using (new CultureScope("de-DE"))
+        {
+            new JWKS(JWKSWithDateLikeKeyId()).Keys.Single().KeyID.Should().Be("2024-05-01T00:00:00Z");
+        }
+    }
+
+    [Fact]
+    public void JWKSWithDateLikeKeyIdKeepsItsValueWhenDeserializedDirectly()
+    {
+        using (new CultureScope("de-DE"))
+        {
+            JsonConvert.DeserializeObject<JWKS>(JWKSWithDateLikeKeyId()).Keys.Single().KeyID.Should().Be("2024-05-01T00:00:00Z");
+        }
+    }
+
+    [Theory]
+    [InlineData("string")]
+    [InlineData("null")]
+    [InlineData("number")]
+    [InlineData("array")]
+    [InlineData("boolean")]
+    public void JWKSWithKeyWhichIsNotAJSONObjectCannotBeParsed(string entryKind)
+    {
+        JToken entry = entryKind switch
+        {
+            "string" => new JValue(ExportedRSAKey().ToString()), // A valid key, but encoded as a JSON string
+            "null" => JValue.CreateNull(),
+            "number" => new JValue(42),
+            "array" => new JArray(ExportedRSAKey()),
+            "boolean" => new JValue(true),
+            _ => throw new System.ArgumentException(entryKind)
+        };
+        var jwks = new JObject { ["keys"] = new JArray(ExportedRSAKey(), entry) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().Be("Key at position 1: A JWK MUST be a JSON object.");
+    }
+
+    [Fact]
+    public void JWKSWithSameKeyIdOnKeysOfDifferentKeyTypesCanBeParsed()
+    {
+        // See RFC 7517 - Section 4.5: keys of different key types may share a "kid"
+        var rsaKey = ExportedRSAKey();
+        var ecKey = JObject.Parse(new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.VerifyDigitalSignature }).Export(KeyMembers.Public));
+        rsaKey["kid"] = "k1";
+        ecKey["kid"] = "k1";
+        var jwks = new JObject { ["keys"] = new JArray(rsaKey, ecKey) };
+
+        var success = JWKS.TryParse(jwks.ToString(), out var parsed, out var errors);
+
+        errors.Should().BeEmpty();
+        success.Should().BeTrue();
+        parsed.Keys.Select(key => key.KeyType).Should().Equal(KeyType.RSA, KeyType.EllipticCurve);
+        parsed.Keys.Should().OnlyContain(key => key.KeyID == "k1");
+    }
+
+    [Fact]
+    public void JWKSIgnoresKeyWithLegacyKeyTypeSpelling()
+    {
+        // "OCT" is the unregistered spelling this library used up to and including 0.7.1 for the key type "oct". It is
+        // no longer read, so within a set such a key is ignored as a key of an unsupported key type.
+        var legacyKey = JObject.Parse(new JWK(Algorithm.HS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }).Export(KeyMembers.All));
+        legacyKey["kty"] = "OCT";
+        var jwks = new JObject { ["keys"] = new JArray(ExportedRSAKey(), legacyKey) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeTrue();
+        errors.Should().BeEmpty();
+        parsed.Keys.Should().ContainSingle().Which.KeyType.Should().Be(KeyType.RSA);
+    }
+
+    [Fact]
+    public void JWKSConcurrentPublicExportDoesNotContainPrivateMembers()
+    {
+        var jwks = new JWKS(new[]
+        {
+            new JWK(Algorithm.ES256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }),
+            new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature })
+        });
+        var privateMembers = new[] { "d", "p", "q", "dp", "dq", "qi" };
+        var leaks = 0;
+
+        Parallel.For(0, 20000, i =>
+        {
+            if (i % 2 == 0)
+            {
+                jwks.Export(KeyMembers.All);
+                return;
+            }
+
+            var exported = JObject.Parse(jwks.Export(KeyMembers.Public));
+            if (exported.GetValue("keys").Children<JObject>().Any(key => privateMembers.Any(member => key.ContainsKey(member))))
+                Interlocked.Increment(ref leaks);
+        });
+
+        leaks.Should().Be(0, "a public export must never contain private key material");
+    }
+
+    [Fact]
+    public void JWKSWithKeyWithoutKeyTypeCannotBeParsed()
+    {
+        var keyWithoutKeyType = JObject.Parse(Ed25519Key);
+        keyWithoutKeyType.Remove("kty");
+        var jwks = new JObject { ["keys"] = new JArray(ExportedRSAKey(), keyWithoutKeyType) };
+
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
+        parsed.Should().BeNull();
+        errors.Should().ContainSingle().Which.Should().StartWith("Key at position 1:").And.Contain("('kty') is missing");
     }
 }

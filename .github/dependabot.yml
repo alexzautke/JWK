@@ -10,3 +10,10 @@ updates:
     schedule:
       interval: daily
       time: "04:00"
+    ignore:
+      - dependency-name: FluentAssertions
+        versions: [">=8.0.0"]
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

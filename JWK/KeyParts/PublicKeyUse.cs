@@ -32,7 +32,7 @@ namespace CreativeCode.JWK.KeyParts
             };
         }
 
-        public object Deserialize(JToken jwkRepresentation)
+        object IJWKConverter.Deserialize(JToken jwkRepresentation)
         {
             if (jwkRepresentation is null)
                 return null;
@@ -40,12 +40,12 @@ namespace CreativeCode.JWK.KeyParts
             return TryGetPublicKeyUse(jwkRepresentation?.ToString());
         }
 
-        public object Deserialize(JObject jwkRepresentation)
+        object IJWKConverter.Deserialize(JObject jwkRepresentation)
         {
             throw new NotImplementedException();
         }
 
-        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
+        string IJWKConverter.Serialize(KeyMembers members, object propertyValue)
         {
             return KeyUse;
         }
