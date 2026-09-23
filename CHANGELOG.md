@@ -10,8 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `JWK.TryValidate` to run the same checks on a JWK which was not built from JSON.
 - `JWK.ToRSAParameters` and `JWK.ToECParameters` to convert a JWK into the .NET key parameters, padding the values as `RSAParameters` and `ECParameters` expect them.
 - `JWK.GetKeySizeInBits`, reporting the size of the modulus of an RSA key, the size of the curve of an elliptic curve key, or the length of the key material of a symmetric key.
-- `EllipticCurve`, the curves registered for the "crv" parameter, with their object identifier, coordinate length and key size.
+- `EllipticCurve`, the curves registered for the "crv" parameter, with their object identifier, coordinate length and key size, `TryGetCurve`, `TryGetCurveForAlgorithm`, `ToECCurve` and `IsPointOnCurve`. `JWK.GetCurve` returns the curve of an elliptic curve key.
 - `Base64Helper.TryBase64urlDecode`, which also rejects input outside the base64url alphabet. `Base64urlDecode` now throws `FormatException` instead of `Exception`.
+- `Base64Helper.Base64urlEncodeUInt`, which encodes a big endian unsigned integer as a Base64urlUInt, without leading zero octets (RFC 7518 - Section 2).
+- `KeyParameter.Encoding` (a `KeyParameterEncoding`), how the value of a key parameter is encoded, and `KeyParameter.ParametersFor` / `KeyParameter.RequiredParametersFor`, the key parameters of a key type and those of them which MUST be present.
+- `Algorithm` and `KeyOperation` compare by name (`Equals` / `GetHashCode`), so that an unrecognized algorithm or operation read twice is still the same value.
 - Support for the "oth" key parameter of a multi-prime RSA key. It is private key material, so it is only exported if the private key is exported.
 - `PS256`, `PS384` and `PS512` are registered as algorithm names. Creating a new key for them is not supported.
 - Members of a JWK which this library does not interpret (e.g. "x5c", "x5t#S256", or every member of a key type it has no support for) are kept in `JWK.AdditionalMembers` and written again by `Export`, instead of being dropped. Since the library cannot tell whether such a member is private key material, a public key export writes only the members registered in RFC 7517 - Section 4 and withholds the rest.
@@ -35,7 +38,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - "unwrapKey" was deserialized as `KeyOperation.DeriveKey` and "deriveKey" as `KeyOperation.DecryptKeyAndValidateDecryption`. Both now map to the operation they name.
 - A "key_ops" entry which could not be recognized was added to the key operations as null, which threw a `NullReferenceException` when the JWK was exported again.
 - A JWK whose only members could not be serialized (e.g. a key without a key type) produced JSON with a leading or stray comma.
-- Exporting the same JWK or JWKS concurrently with different `KeyMembers` could write private key members into a public export: the requested members were stored on the instance for the serializer to read back, so an `Export(KeyMembers.All)` on one thread could change what an `Export(KeyMembers.Public)` on another thread wrote. The members are now passed along with the call and no longer stored on the JWK or JWKS.
+- Exporting the same JWK or JWKS concurrently with different `KeyMembers` could write private key members into a public export: the requested members were stored on the instance for the serializer to read back, so an `Export(KeyMembers.All)` on one thread could change what an `Export(KeyMembers.Public)` on another thread wrote. The members are now passed along with the call and no longer stored on the JWK or JWKS. As a result, a JWK or JWKS serialized directly with `JsonConvert.SerializeObject` is always written with its public members only; before, it used whatever the last `Export` on that instance had asked for.
 - A string which looks like a date - a "kid" such as "2024-05-01T00:00:00Z", for example - was read as a date by Json.NET. `TryParse` then rejected the member as not being a JSON string, and the constructors replaced its value with a culture dependent rendering of that date (e.g. "05/01/2024 00:00:00"), which also changed members kept in `AdditionalMembers`. JWK and JWKS JSON is now read without date parsing, so every string keeps the value it was written with.
 
 ## 0.7.1 - 2023-03-29
