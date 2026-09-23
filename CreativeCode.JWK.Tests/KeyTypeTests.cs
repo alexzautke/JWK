@@ -9,10 +9,12 @@ namespace CreativeCode.JWK.Tests
     public class KeyTypeTests
     {
         [Fact]
-        public void PublicKeyUseCanBeSerialized()
+        public void KeyTypeCanBeSerialized()
         {
             var keyType = KeyType.RSA;
-            keyType.Serialize().Should().Be(keyType.Type, "The value of the Public Key Use Parameter should be serialized");
+            var jwk = new JWK(Algorithm.RS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature });
+
+            JObject.Parse(jwk.Export()).GetValue("kty").ToString().Should().Be(keyType.Type, "The value of the Key Type Parameter should be serialized");
         }
 
         [Fact]

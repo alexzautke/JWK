@@ -163,7 +163,7 @@ namespace CreativeCode.JWK
             foreach (var key in Keys)
             {
                 if(key.IsSymmetric() && members == KeyMembers.Public)
-                    throw new CryptographicException("Symmetric key of type " + (key.KeyType?.Serialize() ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
+                    throw new CryptographicException("Symmetric key of type " + (key.KeyType?.Type ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
             }
 
             // The members travel with the value which is serialized, so that concurrent exports of this JWKS with

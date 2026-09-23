@@ -35,7 +35,7 @@ namespace CreativeCode.JWK.KeyParts
             };
         }
 
-        public object Deserialize(JToken jwkRepresentation)
+        object IJWKConverter.Deserialize(JToken jwkRepresentation)
         {
             if (jwkRepresentation is null)
                 throw new ArgumentNullException("Key Type is a mandatory element and MUST be present");
@@ -43,12 +43,12 @@ namespace CreativeCode.JWK.KeyParts
             return TryGetKeyType(jwkRepresentation?.ToString());
         }
 
-        public object Deserialize(JObject jwkRepresentation)
+        object IJWKConverter.Deserialize(JObject jwkRepresentation)
         {
             throw new NotImplementedException();
         }
 
-        public string Serialize(KeyMembers members = KeyMembers.Public, object propertyValue = null)
+        string IJWKConverter.Serialize(KeyMembers members, object propertyValue)
         {
             return Type;
         }

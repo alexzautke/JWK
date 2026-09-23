@@ -199,7 +199,7 @@ namespace CreativeCode.JWK
         public string Export(KeyMembers members = KeyMembers.Public)
         {
             if (members == KeyMembers.Public && IsSymmetric())
-                throw new CryptographicException("Symmetric key of type " + (KeyType?.Serialize() ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
+                throw new CryptographicException("Symmetric key of type " + (KeyType?.Type ?? "(unknown)") + " has no public members and cannot be exported with KeyMembers.Public.");
 
             // The members travel with the value which is serialized, so that concurrent exports of this JWK with
             // different members cannot see each other's choice
@@ -424,7 +424,7 @@ namespace CreativeCode.JWK
         {
             var curve = EllipticCurve.TryGetCurveForAlgorithm(Algorithm);
             if (curve is null)
-                throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm.Serialize());
+                throw new ArgumentException("Could not create ECCurve based on algorithm: " + Algorithm.Name);
 
             ECDsa eCDsa = ECDsa.Create();
             eCDsa.GenerateKey(curve.ToECCurve());
@@ -481,7 +481,7 @@ namespace CreativeCode.JWK
                Section 5.3.4 Security Effect of the HMAC Key
             */
             HMAC hmac;
-            switch (Algorithm.Serialize()){
+            switch (Algorithm.Name){
                 case "HS256":
                     hmac = new HMACSHA256(CreateHMACKey(64));
                     break;
@@ -492,7 +492,7 @@ namespace CreativeCode.JWK
                     hmac = new HMACSHA512(CreateHMACKey(128));
                     break;
                 default:
-                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm.Serialize() + " (Could not parse expected SHA version)");
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + Algorithm.Name + " (Could not parse expected SHA version)");
             }
 
             var key = Base64urlEncode(hmac.Key);
@@ -514,11 +514,11 @@ namespace CreativeCode.JWK
             var aesKey = Aes.Create();
 
             Regex keySizeRegex = new Regex(@"(?<keySize>[1-9]+)", RegexOptions.Compiled);
-            var matches = keySizeRegex.Match(Algorithm.Serialize());
+            var matches = keySizeRegex.Match(Algorithm.Name);
             var aesKeySizeFromAlgorithmName = matches.Groups["keySize"].Value;
             var aesKeySize = int.Parse(aesKeySizeFromAlgorithmName);
             if(!aesKey.ValidKeySize(aesKeySize)) {
-                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm.Serialize() + " (Could not parse expected AES key size)");
+                throw new CryptographicException("Could not create AES key based on algorithm " + Algorithm.Name + " (Could not parse expected AES key size)");
             }
             aesKey.KeySize = aesKeySize;
             aesKey.GenerateKey();
