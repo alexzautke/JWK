@@ -16,6 +16,7 @@ namespace CreativeCode.JWK.TypeConverters
             "kty", "use", "key_ops", "alg", "kid", "x5u", "x5c", "x5t", "x5t#S256"
         };
 
+
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(JWK);
@@ -26,10 +27,17 @@ namespace CreativeCode.JWK.TypeConverters
             if (!(objectType == typeof(JWK)))
                 throw new ArgumentException("JWK Converter can only objects deserialize of type 'JWK'. Found object of type " + objectType.Name + " instead.");
 
-            JObject jo = JsonReading.LoadObject(reader);
-            var jwk = Activator.CreateInstance(objectType, true) as JWK;
+            return Read(JsonReading.LoadObject(reader));
+        }
 
-            var properties = objectType.GetProperties(); // Get all public properties
+        /// <summary>
+        /// Builds a JWK from its already parsed JSON representation.
+        /// </summary>
+        internal static JWK Read(JObject jo)
+        {
+            var jwk = Activator.CreateInstance(typeof(JWK), true) as JWK;
+
+            var properties = typeof(JWK).GetProperties(); // Get all public properties
             foreach (var property in properties)
             {
                 foreach (var customAttributeData in property.CustomAttributes)

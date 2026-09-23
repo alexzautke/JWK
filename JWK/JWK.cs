@@ -241,14 +241,25 @@ namespace CreativeCode.JWK
                 return false;
             }
 
-            validationErrors.AddRange(JWKValidator.ValidateRepresentation(jwkRepresentation));
+            return TryRead(jwkRepresentation, out result, out errors);
+        }
+
+        /// <summary>
+        /// <see cref="TryParse"/> for a JWK whose JSON has already been parsed, e.g. as part of a JWKS, so that it
+        /// does not have to be written out and parsed again.
+        /// </summary>
+        internal static bool TryRead(JObject jwkRepresentation, out JWK result, out IReadOnlyCollection<string> errors)
+        {
+            result = null;
+            var validationErrors = JWKValidator.ValidateRepresentation(jwkRepresentation);
+            errors = validationErrors;
             if (validationErrors.Count > 0)
                 return false; // A JWK whose JSON does not have the expected shape cannot be read reliably
 
             JWK parsedJWK;
             try
             {
-                parsedJWK = new JWK(jwk);
+                parsedJWK = JWKConverter.Read(jwkRepresentation);
             }
             catch (Exception e)
             {

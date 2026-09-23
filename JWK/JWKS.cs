@@ -97,17 +97,17 @@ namespace CreativeCode.JWK
             for (var i = 0; i < keyTokens.Count; i++)
             {
                 // See RFC 7517 - Section 5: "keys" is an array of JWKs, and a JWK is a JSON object (Section 4)
-                if (!(keyTokens[i] is JObject))
+                if (!(keyTokens[i] is JObject keyRepresentation))
                 {
                     validationErrors.Add($"Key at position {i}: A JWK MUST be a JSON object.");
                     continue;
                 }
 
                 // See RFC 7517 - Section 5: JWKs with a "kty" value which is not understood SHOULD be ignored
-                if (HasUnsupportedKeyType(keyTokens[i]))
+                if (HasUnsupportedKeyType(keyRepresentation))
                     continue;
 
-                if (!JWK.TryParse(keyTokens[i].ToString(), out var key, out var keyErrors))
+                if (!JWK.TryRead(keyRepresentation, out var key, out var keyErrors))
                 {
                     validationErrors.AddRange(keyErrors.Select(error => $"Key at position {i}: {error}"));
                     continue;
