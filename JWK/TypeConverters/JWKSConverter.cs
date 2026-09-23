@@ -45,7 +45,7 @@ namespace CreativeCode.JWK.TypeConverters
             var jwks = (JWKS) value;
             for(var i = 0; i < jwks.Keys.Count(); i++)
             {
-                var keyJSON = jwks.Keys.ElementAt(i).Export(jwks._shouldExportPrivateKey);
+                var keyJSON = jwks.Keys.ElementAt(i).Export(jwks._exportedMembers);
                 writer.WriteRaw(keyJSON);
                 if (i + 1 != jwks.Keys.Count())
                     writer.WriteRaw(",");

@@ -23,7 +23,7 @@ namespace CreativeCode.JWK.Tests
             var algorithm = Algorithm.RS256;
             var jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -54,7 +54,7 @@ namespace CreativeCode.JWK.Tests
             var algorithm = Algorithm.RS384;
             var jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -85,7 +85,7 @@ namespace CreativeCode.JWK.Tests
             var algorithm = Algorithm.RS512;
             var jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -116,7 +116,7 @@ namespace CreativeCode.JWK.Tests
             Algorithm algorithm = Algorithm.RS384;
             JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(false);
+            string jwkString = jwk.Export(KeyMembers.Public);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -147,7 +147,7 @@ namespace CreativeCode.JWK.Tests
             Algorithm algorithm = Algorithm.ES256;
             JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -174,7 +174,7 @@ namespace CreativeCode.JWK.Tests
             Algorithm algorithm = Algorithm.ES384;
             JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -201,7 +201,7 @@ namespace CreativeCode.JWK.Tests
             Algorithm algorithm = Algorithm.ES512;
             JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -228,7 +228,7 @@ namespace CreativeCode.JWK.Tests
             Algorithm algorithm = Algorithm.ES256;
             JWK jwk = new JWK(algorithm, keyUse, keyOperations);
 
-            string jwkString = jwk.Export(false);
+            string jwkString = jwk.Export(KeyMembers.Public);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -268,7 +268,7 @@ namespace CreativeCode.JWK.Tests
                 };
             JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.GetValue("n").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterN));
@@ -298,7 +298,7 @@ namespace CreativeCode.JWK.Tests
             };
             JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.GetValue("crv").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterCRV));
@@ -356,7 +356,7 @@ namespace CreativeCode.JWK.Tests
 
             JWK jwk = new JWK(keyType, keyParameters);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.GetValue("kty").ToString().Should().Be(KeyType.EllipticCurve.Type);
@@ -382,7 +382,7 @@ namespace CreativeCode.JWK.Tests
             };
             JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.GetValue("crv").ToString().Should().Be(keyParameters.GetValueOrDefault(ECKeyParameterCRV));
@@ -420,7 +420,7 @@ namespace CreativeCode.JWK.Tests
                 };
             JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.GetValue("n").ToString().Should().Be(keyParameters.GetValueOrDefault(RSAKeyParameterN));
@@ -470,7 +470,7 @@ namespace CreativeCode.JWK.Tests
                 };
                 JWK jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, "test");
 
-                var _ = jwk.Export(true);
+                var _ = jwk.Export(KeyMembers.All);
             }
             
             var tasks = Enumerable.Range(0, 4).Select(_ => Task.Run(export));
@@ -486,7 +486,7 @@ namespace CreativeCode.JWK.Tests
             var keySize = 3000;
             var jwk = new JWK(algorithm, keyUse, keyOperations, keySize);
 
-            string jwkString = jwk.Export(true);
+            string jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
 
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -624,7 +624,7 @@ namespace CreativeCode.JWK.Tests
 
             var jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, keyId);
             
-            var jwkString = jwk.Export(true);
+            var jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
             
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -739,7 +739,7 @@ namespace CreativeCode.JWK.Tests
 
             var jwk = new JWK(keyType, keyParameters, keyUse, keyOperations, algorithm, keyId);
             
-            var jwkString = jwk.Export(true);
+            var jwkString = jwk.Export(KeyMembers.All);
             var parsedJWK = JObject.Parse(jwkString);
             
             parsedJWK.TryGetValue("kty", out var _).Should().BeTrue();
@@ -756,6 +756,31 @@ namespace CreativeCode.JWK.Tests
             parsedJWK.GetValue("use").ToString().Should().Be(PublicKeyUse.Signature.KeyUse);
             parsedJWK.GetValue("key_ops").Values<string>().Count().Should().Be(2);
             parsedJWK.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(new[] { KeyOperation.ComputeDigitalSignature.Operation, KeyOperation.VerifyDigitalSignature.Operation });
+        }
+
+        [Fact]
+        public void JWKWithSpecialCharactersInKeyIdCanBeExported()
+        {
+            var jwk = new JWK("{\"kty\":\"RSA\",\"n\":\"AQAB\",\"e\":\"AQAB\",\"kid\":\"a\\\"b\"}");
+
+            JObject.Parse(jwk.Export(KeyMembers.Public)).GetValue("kid").ToString().Should().Be("a\"b");
+        }
+
+        [Fact]
+        public void JWKWithSpecialCharactersInAlgorithmCanBeExported()
+        {
+            // An algorithm this library does not recognize keeps its name, which can be any string
+            var jwk = new JWK("{\"kty\":\"RSA\",\"n\":\"AQAB\",\"e\":\"AQAB\",\"alg\":\"a\\\"b\"}");
+
+            JObject.Parse(jwk.Export(KeyMembers.Public)).GetValue("alg").ToString().Should().Be("a\"b");
+        }
+
+        [Fact]
+        public void JWKWithSymmetricAlgorithmAndUnsupportedKeyTypeThrowsException()
+        {
+            var jwk = new JWK("{\"kty\":\"OKP\",\"alg\":\"HS256\",\"k\":\"AQAB\"}");
+
+            Assert.Throws<CryptographicException>(() => jwk.Export(KeyMembers.Public));
         }
     }
 }

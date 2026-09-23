@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.8.0 - unreleased
+
+### Added
+- `JWK.TryParse` and `JWKS.TryParse`: a validating parse which reports every reason why a key is not a valid key instead of throwing on the first one. It checks what RFC 7517 / RFC 7518 require of a key - a supported key type, the presence and encoding of the parameters that key type requires, "use" and "key_ops" having the shape the RFC gives them, all of the other RSA private key parameters being present if any of them is, a known curve, coordinates padded to the size of that curve, a public key which really is a point on the curve it claims, and unique key ids within a key set. Which algorithms, key sizes or key ids are acceptable is policy and remains the caller's own decision. The constructors keep their current, throwing behaviour.
+- `JWK.TryValidate` to run the same checks on a JWK which was not built from JSON.
+- `JWK.ToRSAParameters` and `JWK.ToECParameters` to convert a JWK into the .NET key parameters, padding the values as `RSAParameters` and `ECParameters` expect them.
+- `JWK.GetKeySizeInBits`, reporting the size of the modulus of an RSA key, the size of the curve of an elliptic curve key, or the length of the key material of a symmetric key.
+- `EllipticCurve`, the curves registered for the "crv" parameter, with their object identifier, coordinate length and key size.
+- `Base64Helper.TryBase64urlDecode`, which also rejects input outside the base64url alphabet. `Base64urlDecode` now throws `FormatException` instead of `Exception`.
+- Support for the "oth" key parameter of a multi-prime RSA key. It is private key material, so it is only exported if the private key is exported.
+- `PS256`, `PS384` and `PS512` are registered as algorithm names. Creating a new key for them is not supported.
+- Members of a JWK which this library does not interpret (e.g. "x5c", "x5t#S256", or every member of a key type it has no support for) are kept in `JWK.AdditionalMembers` and written again by `Export`, instead of being dropped. Since the library cannot tell whether such a member is private key material, a public key export writes only the members registered in RFC 7517 - Section 4 and withholds the rest.
+
+### Changed
+- `JWK.Export` and `JWKS.Export` take a `KeyMembers` value instead of a bool: `Export(KeyMembers.Public)` (the default) or `Export(KeyMembers.All)`. `Export(true)` said nothing at the call site about what it would write out. The bool overload still works but is marked obsolete. `Serialize` on `Algorithm`, `KeyType` and `PublicKeyUse` takes the same `KeyMembers` value; it is defaulted, so an existing `Serialize()` call is unaffected.
+- The symmetric key type is now spelled "oct" as registered in RFC 7518 - Section 6.1, instead of "OCT". A JWK which uses the previous spelling is still read correctly, but keys exported by this library change: their "kty" is now "oct".
+- The curve of the ES512 algorithm is now named "P-521" as registered in RFC 7518 - Section 6.2.1.1, instead of "P-512". The key material itself is unchanged - it always was a secp521r1 key - and a JWK which uses the previous name is still read correctly.
+- An unrecognized "alg" is no longer discarded. `Algorithm.TryGetAlgorithm` returns an instance carrying the name, with `IsRecognized` set to false, so that an algorithm this library does not know is no longer indistinguishable from an absent one and survives an export. The same applies to an unrecognized "key_ops" entry.
+- Creating a new key for an algorithm this library cannot generate a key for (including `Algorithm.None`) now throws an `ArgumentException` instead of returning a JWK without a key type and without key parameters.
+- A JWKS constructed from an empty set of keys now throws `ArgumentException` rather than `ArgumentNullException`. `JWKS.TryParse` reports it as an error instead of throwing.
+- `KeyParameter.RSAKeyParameters`, `.ECKeyParameters` and `.OctKeyParameters` are declared as `IReadOnlyCollection<KeyParameter>` instead of `IEnumerable<KeyParameter>`, so that a caller can count them without enumerating them twice. Source compatible, but a recompile is needed.
+
+### Fixed
+- The key parameters of a generated RSA key were exported with the leading zero octets that `RSAParameters` pads its values with. A Base64urlUInt "MUST utilize the minimum number of octets needed to represent the value" (RFC 7518 - Section 2), so roughly one in fifty generated keys was not encoded as the RFC requires. `Base64Helper.Base64urlEncodeUInt` does this encoding.
+- Member values were concatenated into the exported JSON without escaping, so a value containing a double quote - a "kid" or a key parameter read from an untrusted JWK, for example - produced JSON which could not be parsed again.
+- "unwrapKey" was deserialized as `KeyOperation.DeriveKey` and "deriveKey" as `KeyOperation.DecryptKeyAndValidateDecryption`. Both now map to the operation they name.
+- A "key_ops" entry which could not be recognized was added to the key operations as null, which threw a `NullReferenceException` when the JWK was exported again.
+- A JWK whose only members could not be serialized (e.g. a key without a key type) produced JSON with a leading or stray comma.
+
 ## 0.7.1 - 2023-03-29
 
 ### Changed

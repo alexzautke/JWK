@@ -45,7 +45,7 @@ namespace CreativeCode.JWK.KeyParts
             throw new NotImplementedException();
         }
 
-        public string Serialize(bool shouldExportPrivateKey = false, object propertyValue = null)
+        public string Serialize(KeyMembers members = KeyMembers.Public, object propertyValue = null)
         {
             return KeyUse;
         }
