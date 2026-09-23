@@ -13,7 +13,7 @@ namespace CreativeCode.JWK.TypeConverters
             return objectType == typeof(JWKS);
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (!(objectType == typeof(JWKS)))
                 throw new ArgumentException("JWKS Converter can only objects deserialize of type 'JWKS'. Found object of type " + objectType.Name + " instead.");
@@ -33,7 +33,7 @@ namespace CreativeCode.JWK.TypeConverters
             return new JWKS(keys);
         }
         
-        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             // JWKS.Export passes the members to write along with the key set. A JWKS which is serialized directly,
             // without JWKS.Export, is written with the public members of its keys only.
@@ -56,12 +56,14 @@ namespace CreativeCode.JWK.TypeConverters
             writer.WritePropertyName("keys");
             writer.WriteStartArray();
 
-            for(var i = 0; i < jwks.Keys.Count(); i++)
+            var isFirstKey = true;
+            foreach (var key in jwks.Keys)
             {
-                var keyJSON = jwks.Keys.ElementAt(i).Export(members);
-                writer.WriteRaw(keyJSON);
-                if (i + 1 != jwks.Keys.Count())
+                if (!isFirstKey)
                     writer.WriteRaw(",");
+                isFirstKey = false;
+
+                writer.WriteRaw(key.Export(members));
             }
             
             writer.WriteEndArray();
