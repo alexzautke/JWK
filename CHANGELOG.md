@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 0.8.0 - unreleased
+## 0.8.0 - 2026-09-23
 
 ### Added
 - `JWK.TryParse` and `JWKS.TryParse`: a validating parse which reports every reason why a key is not a valid key instead of throwing on the first one. It checks what RFC 7517 / RFC 7518 require of a key - a supported key type, the presence and encoding of the parameters that key type requires, "use" and "key_ops" having the shape the RFC gives them, no duplicate "key_ops" values, all of the other RSA private key parameters being present if any of them is, a known curve, coordinates padded to the size of that curve, a public key which really is a point on the curve it claims, every entry of the "keys" of a key set being a JSON object, and unique key ids among the keys of the same key type within a key set (keys of different key types may share a key id, as RFC 7517 - Section 4.5 allows). `JWKS.TryParse` ignores a key whose key type is not supported, as RFC 7517 - Section 5 recommends, and only rejects the set if no key of a supported key type remains. Which algorithms, key sizes or key ids are acceptable is policy and remains the caller's own decision. The constructors keep their current, throwing behaviour.

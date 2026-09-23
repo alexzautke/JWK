@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <Authors>Alexander Zautke</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageLicenseUrl>https://github.com/alexzautke/JWK/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Owners>Alexander Zautke</Owners>
     <PackageProjectUrl>https://github.com/alexzautke/JWK</PackageProjectUrl>
     <Summary>C# JWKs - JSON Web Keys (RFC7517)</Summary>
