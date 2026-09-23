@@ -292,19 +292,17 @@ public class JWKSTests
     }
 
     [Fact]
-    public void JWKSWithSameKeyIdOnLegacyAndRegisteredSymmetricKeyTypeCannotBeParsed()
+    public void JWKSIgnoresKeyWithLegacyKeyTypeSpelling()
     {
-        // "OCT" is the spelling this library used up to 0.7.1 for the key type registered as "oct"
+        // "OCT" is the unregistered spelling this library used up to and including 0.7.1 for the key type "oct". It is
+        // no longer read, so within a set such a key is ignored as a key of an unsupported key type.
         var legacyKey = JObject.Parse(new JWK(Algorithm.HS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }).Export(KeyMembers.All));
-        var registeredKey = JObject.Parse(new JWK(Algorithm.HS256, PublicKeyUse.Signature, new[] { KeyOperation.ComputeDigitalSignature }).Export(KeyMembers.All));
         legacyKey["kty"] = "OCT";
-        registeredKey["kty"] = "oct";
-        registeredKey["kid"] = legacyKey.GetValue("kid").ToString();
-        var jwks = new JObject { ["keys"] = new JArray(legacyKey, registeredKey) };
+        var jwks = new JObject { ["keys"] = new JArray(ExportedRSAKey(), legacyKey) };
 
-        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeFalse();
-        parsed.Should().BeNull();
-        errors.Should().ContainSingle().Which.Should().StartWith("Key at position 1:").And.Contain("used by more than one key");
+        JWKS.TryParse(jwks.ToString(), out var parsed, out var errors).Should().BeTrue();
+        errors.Should().BeEmpty();
+        parsed.Keys.Should().ContainSingle().Which.KeyType.Should().Be(KeyType.RSA);
     }
 
     [Fact]

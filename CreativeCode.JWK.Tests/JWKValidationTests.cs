@@ -69,20 +69,31 @@ namespace CreativeCode.JWK.Tests
             }
         }
 
-        [Fact]
-        public void JWKWithLegacyCurveNameCanBeParsed()
-        {
-            var exported = ExportedKey(Algorithm.ES512);
-            exported["crv"] = "P-512"; // The name this library used up to and including 0.7.1
-
-            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeTrue();
-            errors.Should().BeEmpty();
-            jwk.GetCurve().Should().Be(EllipticCurve.P521);
-        }
-
         #endregion Valid keys
 
         #region Structural errors
+
+        [Fact]
+        public void JWKWithLegacyCurveNameCannotBeParsed()
+        {
+            var exported = ExportedKey(Algorithm.ES512);
+            exported["crv"] = "P-512"; // The unregistered name this library used up to and including 0.7.1
+
+            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeFalse();
+            jwk.Should().BeNull();
+            errors.Should().Contain("The curve 'P-512' is not supported.");
+        }
+
+        [Fact]
+        public void JWKWithLegacyKeyTypeSpellingCannotBeParsed()
+        {
+            var exported = ExportedKey(Algorithm.HS256);
+            exported["kty"] = "OCT"; // The unregistered spelling this library used up to and including 0.7.1
+
+            JWK.TryParse(exported.ToString(), out var jwk, out var errors).Should().BeFalse();
+            jwk.Should().BeNull();
+            errors.Should().ContainSingle().Which.Should().Be("The key type 'OCT' is not supported.");
+        }
 
         [Fact]
         public void JWKWithoutKeyTypeCannotBeParsed()

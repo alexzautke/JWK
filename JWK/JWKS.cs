@@ -116,7 +116,7 @@ namespace CreativeCode.JWK
                 }
 
                 // See RFC 7517 - Section 4.5: keys of different key types may use the same "kid", keys of the same key
-                // type should not. The normalised type is compared, so that the legacy "OCT" and "oct" count as one type
+                // type should not
                 if (key.KeyID is { } && !keyIds.Add((key.KeyType?.Type, key.KeyID)))
                     validationErrors.Add($"Key at position {i}: the key id '{key.KeyID}' is used by more than one key of type '{key.KeyType?.Type}' in this set.");
 

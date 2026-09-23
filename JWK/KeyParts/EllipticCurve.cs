@@ -13,7 +13,6 @@ namespace CreativeCode.JWK.KeyParts
         private const string P256_VALUE = "P-256";
         private const string P384_VALUE = "P-384";
         private const string P521_VALUE = "P-521";
-        private const string P521_LEGACY_VALUE = "P-512"; // Name used by this library up to and including 0.7.1 for the curve of ES512
 
         // Domain parameters of the NIST prime curves. For all three, the curve is y^2 = x^3 - 3x + b over GF(p).
         private const string P256_PRIME = "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF";
@@ -69,7 +68,6 @@ namespace CreativeCode.JWK.KeyParts
                 P256_VALUE => P256,
                 P384_VALUE => P384,
                 P521_VALUE => P521,
-                P521_LEGACY_VALUE => P521,
                 _ => null
             };
         }
