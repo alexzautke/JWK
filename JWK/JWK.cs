@@ -164,9 +164,6 @@ namespace CreativeCode.JWK
                     rsaKeySize ??= MinimumRsaKeySize;
                     rsaKeySize = Math.Max(rsaKeySize.Value, MinimumRsaKeySize);
 
-                    if(rsaKeySize is null)
-                        throw new InvalidOperationException("rsaKeySize must be provided if a key with KeyType RSA is initialized");
-
                     if (rsaKeySize > MaximumRsaKeySize)
                         throw new CryptographicException($"rsaKeySize is too large. Maximum key size is '{MaximumRsaKeySize}' bits");
 
@@ -178,9 +175,8 @@ namespace CreativeCode.JWK
                 case 'E':
                     ECParameters();
                     break;
-                default:
-                    NONEParameters();
-                    break;
+                default: // Unreachable: the constructor only accepts algorithms it can create a key for
+                    throw new InvalidOperationException($"Cannot create a new key for algorithm '{Algorithm.Name}'.");
             }
 
             #if DEBUG
@@ -540,11 +536,6 @@ namespace CreativeCode.JWK
             {
                 {OctKeyParameterK, key}
             };
-        }
-
-        private void NONEParameters()
-        {
-            KeyParameters = null;
         }
 
         #endregion Create digital keys
