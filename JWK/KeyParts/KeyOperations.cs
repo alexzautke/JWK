@@ -46,6 +46,10 @@ namespace CreativeCode.JWK.KeyParts
         /// an instance with <see cref="IsRecognized"/> set to false instead of null. Returns null only if
         /// <paramref name="keyOperation"/> is null or empty.
         /// </summary>
+        /// <remarks>
+        /// Up to and including 0.7.1 an unknown name returned null. A caller which rejects an operation by checking the
+        /// result for null has to check <see cref="IsRecognized"/> instead, or it accepts any operation name.
+        /// </remarks>
         public static KeyOperation TryGetKeyOperation(string keyOperation)
         {
             return keyOperation switch

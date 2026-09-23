@@ -79,6 +79,10 @@ namespace CreativeCode.JWK.KeyParts
         /// an instance with <see cref="IsRecognized"/> set to false instead of null, so that the "alg" value of a JWK
         /// survives deserialization and export. Returns null only if <paramref name="algorithm"/> is null or empty.
         /// </summary>
+        /// <remarks>
+        /// Up to and including 0.7.1 an unknown name returned null. A caller which rejects an algorithm by checking the
+        /// result for null has to check <see cref="IsRecognized"/> instead, or it accepts any algorithm name.
+        /// </remarks>
         public static Algorithm TryGetAlgorithm(string algorithm)
         {
             return algorithm switch
