@@ -206,12 +206,6 @@ namespace CreativeCode.JWK
             return JsonConvert.SerializeObject(new JWKExport(this, members));
         }
 
-        [Obsolete("Use Export(KeyMembers) instead. Export(true) is Export(KeyMembers.All), Export(false) is Export(KeyMembers.Public).")]
-        public string Export(bool shouldExportPrivateKey)
-        {
-            return Export(shouldExportPrivateKey ? KeyMembers.All : KeyMembers.Public);
-        }
-
         #region Validating parse
 
         /// <summary>
